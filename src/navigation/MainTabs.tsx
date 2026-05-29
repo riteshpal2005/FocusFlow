@@ -1,0 +1,36 @@
+import React from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
+import { MainTabParamList } from '../navigation/types';
+import { HomeScreen } from '../screens/main/HomeScreen';
+import { ProfileScreen } from '../screens/main/ProfileScreen';
+
+const Tab = createBottomTabNavigator<MainTabParamList>();
+
+export const MainTabs = () => {
+    return (
+        <Tab.Navigator
+            screenOptions={({ route }) => ({
+                headerShown: false,
+                tabBarActiveTintColor: '#2563EB',
+                tabBarInactiveTintColor: 'gray',
+
+                tabBarIcon: ({ color, size }) => {
+                    let iconName: keyof typeof Ionicons.glyphMap;
+                    if (route.name === 'Home') {
+                        iconName = 'home-outline';
+                    } else if (route.name === 'Profile') {
+                        iconName = 'person-outline';
+                    } else {
+                        iconName = 'ellipse-outline';
+                    }
+
+                    return <Ionicons name={iconName} size={size} color={color} />;
+                },
+            })}
+        >
+            <Tab.Screen name="Home" component={HomeScreen} />
+            <Tab.Screen name="Profile" component={ProfileScreen} />
+        </Tab.Navigator>
+    );
+};

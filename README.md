@@ -1,28 +1,78 @@
 # 🌊 FocusFlow
 
-FocusFlow is a minimalist, offline-first habit performance dashboard. It is designed to test and demonstrate nested layouts, native gesture interception, global context state, and disk caching in a production-grade React Native environment.
+> A minimalist, offline-first habit and task performance dashboard built with React Native (Expo) and strict TypeScript.
 
-### 🧠 The Learning Journey
-**Note:** *This project is actively being built as part of a rigorous, guided learning sprint.* I am building FocusFlow under the guidance of an AI Senior Engineering Coach to bridge the gap between basic coding and elite software architecture. The goal is not just to make an app that works, but to master clean code principles, strict TypeScript typing, and rendering cycle optimization (avoiding unnecessary frame drops). Every file is written from scratch, architected for performance, and strictly code-reviewed.
+This repository serves as a rigorous, independent learning sprint. The objective is to bridge the gap between basic component scaffolding and elite software architecture using AI-assisted development tools. Every module is written from scratch, architected for minimal rendering cycles, and strictly type-checked.
 
-### 🛠 Tech Stack (Strict Requirements)
-- **Framework:** Expo (Managed Workflow)
+## ✨ Core Features
+
+- **Universal Theme Engine:** Zero-tearing, dynamically derived dark/light mode context.
+- **Authentication Gateway:** Simulated user sessions managing root navigation state.
+- **Deep Navigation Routing:** Strongly typed nested stack and bottom-tab navigation.
+- **Offline-First Persistence:** (In Progress) Disk caching for seamless offline usability.
+- **Optimized UI Components:** Reusable, theme-aware core components (Inputs, Buttons).
+
+## 🛠 Tech Stack
+
+- **Framework:** React Native (Expo Managed Workflow)
 - **Language:** Strict TypeScript
-- **Core UI:** React Native Core Components
-- **Navigation:** React Navigation (Native Stack & Bottom Tabs)
-- **State Management:** React Context API (Auth & Theme specifically)
-- **Persistence:** AsyncStorage
+- **Navigation:** `@react-navigation/native` (Native Stack & Bottom Tabs)
+- **State Management:** React Context API (Auth & Theme) + `useMemo` optimizations
+- **Storage:** `@react-native-async-storage/async-storage`
+- **Icons:** `@expo/vector-icons` (Ionicons)
 
-### 🚀 Architecture Roadmap
-The project is being developed chronologically through these architectural phases:
+---
 
-- [x] **Phase 1: Global State Setup** (Strictly typed Theme & Auth contexts)
-- [ ] **Phase 2: Route Maps** (Rigid TypeScript Navigation dictionaries)
-- [ ] **Phase 3: Navigation Architecture** (Nested Stack Construction)
-- [ ] **Phase 4: UI Gateway** (Auth screens & custom reusable components)
-- [ ] **Phase 5: Storage Layer Engine** (AsyncStorage caching & Main Features)
+## 🏗 System Architecture
 
-### 📂 Phase 1 Highlight: State Management
-Phase 1 implements a highly optimized global state layer:
-- **`ThemeContext`**: A strictly typed theme engine calculating derived colors based on literal types (`'light' | 'dark'`) without unnecessary re-renders.
-- **`AuthContext`**: A simulated authentication gateway wrapped in Promises and `useMemo` caching to protect the component tree from performance leaks.
+FocusFlow utilizes a unidirectional data flow with tightly scoped global contexts to prevent prop-drilling and unnecessary re-renders.
+
+### 1. The Global State Layer
+
+State that affects the entire application is isolated into strictly typed Context Providers wrapped around the root `App.tsx`.
+
+- `ThemeContext`: Holds the active `ThemeMode`. It computes the active color palette _dynamically_ without storing the entire color dictionary in state, saving memory.
+- `AuthContext`: Acts as the Auth Gateway. Wraps the user session in a `useMemo` block so the underlying component tree only re-renders when authentication status actually changes.
+
+### 2. The Navigation Routing Engine
+
+Navigation is strictly typed using a central dictionary (`types.ts`). If a screen is passed the wrong data shape, the TypeScript compiler throws a fatal error before the bundle builds.
+
+- **Root Navigator:** A conditional gateway. It listens to `AuthContext`. If unauthenticated, it locks the user in the `AuthStack`. If authenticated, it grants access to the `MainTabs`.
+- **Main Tabs & Home Stack:** Deeply nested routes allowing users to click a habit and push a detailed analytics view over the main tab bar.
+
+---
+
+## 🔄 Data Flow (State & Persistence)
+
+1. **User Interaction:** A user toggles a theme or logs in via a component (e.g., `CustomButton`).
+2. **Context Update:** The component calls the exposed Context function (e.g., `toggleTheme()`).
+3. **State Mutation:** The Context updates its local React State.
+4. **Disk Sync (Upcoming):** A `useEffect` hook intercepts the state change and asynchronously serializes the new state to device storage (AsyncStorage) to ensure persistence across sessions.
+5. **UI Repaint:** The derived variables (like `colors`) recalculate, and only the components consuming that specific context are repainted.
+
+---
+
+## 📂 Directory Structure
+
+```text
+FocusFlow/
+├── App.tsx                     # Application Root & Provider Wrappers
+├── src/
+│   ├── components/
+│   │   └── common/             # Reusable, theme-aware UI elements
+│   │       ├── CustomButton.tsx
+│   │       └── CustomInput.tsx
+│   ├── context/                # Global State Management
+│   │   ├── AuthContext.tsx
+│   │   └── ThemeContext.tsx
+│   ├── navigation/             # Routing Architecture
+│   │   ├── types.ts            # Centralized TypeScript Route Dictionary
+│   │   ├── RootNavigator.tsx   # Master Conditional Switch
+│   │   ├── AuthStack.tsx       # Unauthenticated Routes
+│   │   └── MainTabs.tsx        # Authenticated Routes
+│   ├── screens/
+│   │   ├── auth/               # Login & Registration views
+│   │   └── main/               # Dashboard, Profiles, and Details
+│   └── utils/                  # Helper functions and Storage configs
+```
