@@ -1,4 +1,5 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
+import { getTheme, saveTheme } from '../utils/storageHelpers';
 
 type ThemeMode = 'light' | 'dark';
 
@@ -38,15 +39,25 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
 	const [theme, setTheme] = useState<ThemeMode>('dark');
-	const colors = theme === 'dark' ? LightColors : DarkColors;
+
+	useEffect(() => {
+		const loadTheme = async () => {
+			const savedTheme = await getTheme();
+			if (savedTheme) {
+				setTheme(savedTheme);
+			}
+		};
+		loadTheme();
+	}), [];
+
+	const colors = theme === 'dark' ? DarkColors : LightColors;
 	const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
-};
-	// TODO: Create a state variable called 'theme' defaulting to 'light'
-    
-    // TODO: Create a 'toggleTheme' function that switches 'theme' between 'light' and 'dark'
-    
-    // TODO: Create a 'colors' variable that equals LightColors if theme is 'light', or DarkColors if 'dark'
+    	setTheme((prevTheme) => {
+			const newTheme = prevTheme === 'light' ? 'dark' : 'light';
+			saveTheme(newTheme); // Save the new theme to disk
+			return newTheme;
+		});
+	};
 
 	return (
         <ThemeContext.Provider value={{ theme, colors, toggleTheme }}>

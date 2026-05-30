@@ -4,17 +4,22 @@ import { Ionicons } from '@expo/vector-icons';
 import { MainTabParamList } from '../navigation/types';
 import { HomeScreen } from '../screens/main/HomeScreen';
 import { ProfileScreen } from '../screens/main/ProfileScreen';
+import { useTheme } from '../context/ThemeContext';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export const MainTabs = () => {
+    const { colors } = useTheme();
     return (
         <Tab.Navigator
             screenOptions={({ route }) => ({
                 headerShown: false,
-                tabBarActiveTintColor: '#2563EB',
+                tabBarActiveTintColor: colors.primary,
                 tabBarInactiveTintColor: 'gray',
-
+                tabBarStyle: {
+                    backgroundColor: colors.surface,
+                    borderTopColor: colors.border || '#333',
+                },
                 tabBarIcon: ({ color, size }) => {
                     let iconName: keyof typeof Ionicons.glyphMap;
                     if (route.name === 'Home') {

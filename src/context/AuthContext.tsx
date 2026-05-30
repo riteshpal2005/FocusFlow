@@ -1,4 +1,5 @@
-import React, { createContext, useState, useMemo } from 'react';
+import React, { createContext, useState, useMemo, useEffect } from 'react';
+import { saveUser, getUser, clearAuthStorage } from '../utils/storageHelpers';
 
 interface User {
     id: string;
@@ -16,26 +17,41 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const loadSession = async () => {
+            const savedUser = await getUser();
+            if (savedUser) {
+                setUser(savedUser);
+            }
+            setIsLoading(false);
+        };
+        loadSession();
+    }, []);
+
     const login = async (username: string): Promise<void> => {
         setIsLoading(true);
 
         return new Promise((resolve) => {
-            setTimeout(() => {
-                setUser({ id: '1', username: username });
+            setTimeout(async () => {
+                const mockUser = { id: '1', username: username };
+                await saveUser(mockUser);
+                setUser(mockUser);
                 setIsLoading(false);
                 resolve();
             }, 1000);
         });
     };
     const logout = async (): Promise<void> => {
-    setIsLoading(true); // 1. Turn on spinner
+    setIsLoading(true);
 
     return new Promise((resolve) => {
-        setTimeout(() => {
-            setUser(null); // 2. Clear the user state
-            setIsLoading(false); // 3. Turn off spinner
-            resolve(); // 4. Tell the app the logout is complete
+        setTimeout(async () => {
+            setUser(null);
+            await clearAuthStorage();
+            setIsLoading(false); 
+            resolve(); 
         }, 1000);
     });
 };

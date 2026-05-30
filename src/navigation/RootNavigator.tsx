@@ -3,7 +3,8 @@ import { ActivityIndicator, View } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { RootStackParamList } from "./types";
 import { useAuth } from "../context/AuthContext";
-
+import { StatusBar } from "expo-status-bar";
+import { useTheme } from "../context/ThemeContext";
 import { AuthStack } from "./AuthStack";
 import { MainTabs } from "./MainTabs";
 import { HabitDetailScreen } from "../screens/main/HabitDetailScreen";
@@ -12,6 +13,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export const RootNavigator = () => {
     const { user, isLoading } = useAuth();
+    const { theme } = useTheme();
 
     if (isLoading) {
         return (
@@ -22,6 +24,8 @@ export const RootNavigator = () => {
     }
 
     return (
+        <>
+            <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 {user ? (
                     <>
@@ -34,5 +38,6 @@ export const RootNavigator = () => {
                     </>
                 )}
             </Stack.Navigator>
-        );
+        </>
+    );
 };
