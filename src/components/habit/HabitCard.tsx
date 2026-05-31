@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Habit } from '../../utils/storageHelpers';
-import { useTheme } from '../../store/useThemeStore';
+import { useTheme } from '../../context/ThemeContext';
 import Animated, { FadeInRight, FadeOutLeft, LinearTransition } from 'react-native-reanimated';
 
 interface HabitCardProps {

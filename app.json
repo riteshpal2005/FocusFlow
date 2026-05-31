@@ -1,19 +1,11 @@
 {
-  "$schema": "https://schema.expo.dev/app.json",
   "expo": {
     "name": "FocusFlow",
     "slug": "focus-flow-app",
     "version": "1.0.0",
-    "jsEngine": "hermes",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "dev.riteshpal.focusflow"
@@ -24,12 +16,21 @@
         "backgroundColor": "#ffffff"
       },
       "package": "dev.riteshpal.focusflow",
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ]
+    ],
     "extra": {
       "eas": {
         "projectId": "db673e9f-9eb2-4e4d-89d6-8e3c89b34ae3"

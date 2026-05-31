@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Text, TextInput, View, StyleSheet, TextInputProps, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
-import { useAuth } from '../../store/useAuthStore';
-import { useTheme } from '../../store/useThemeStore';
+import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { CustomButton } from '../../components/common/CustomButton';
 import { CustomInput } from '../../components/common/CustomInput';
 import { Ionicons } from '@expo/vector-icons';

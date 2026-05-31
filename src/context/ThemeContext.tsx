@@ -26,7 +26,6 @@ const LightColors: ThemeColors = {
 }
 
 const DarkColors: ThemeColors = {
-	// TODO: Define a dark mode color palette that matches the ThemeColors interface
 	background: '#121212',
     surface: '#1E1E1E',
     text: '#FFFFFF',
@@ -54,7 +53,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 	const toggleTheme = () => {
     	setTheme((prevTheme) => {
 			const newTheme = prevTheme === 'light' ? 'dark' : 'light';
-			saveTheme(newTheme); // Save the new theme to disk
+			saveTheme(newTheme);
 			return newTheme;
 		});
 	};
@@ -70,9 +69,6 @@ export const useTheme = () => {
 	const context = React.useContext(ThemeContext);
 	if (!context) {
     	throw new Error('useTheme must be used within a ThemeProvider');
-	}	
-	// TODO: Write an 'if' statement that throws an Error if context is undefined.
-    // (This protects us from accidentally using useTheme outside of the ThemeProvider)
-
-	return context; // Type is guaranteed to be ThemeContextType here
+	}
+	return context;
 };
