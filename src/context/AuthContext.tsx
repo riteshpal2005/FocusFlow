@@ -32,7 +32,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const login = async (username: string): Promise<void> => {
         setIsLoading(true);
-
         return new Promise((resolve) => {
             setTimeout(async () => {
                 const mockUser = { id: '1', username: username };
@@ -43,18 +42,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             }, 1000);
         });
     };
-    const logout = async (): Promise<void> => {
-    setIsLoading(true);
 
-    return new Promise((resolve) => {
-        setTimeout(async () => {
-            setUser(null);
-            await clearAuthStorage();
-            setIsLoading(false); 
-            resolve(); 
-        }, 1000);
-    });
-};
+    const logout = async (): Promise<void> => {
+        setIsLoading(true);
+        return new Promise((resolve) => {
+            setTimeout(async () => {
+                setUser(null);
+                await clearAuthStorage();
+                setIsLoading(false); 
+                resolve(); 
+            }, 1000);
+        });
+    };
+    
     const value = useMemo(() => ({
         user,
         isLoading,

@@ -8,6 +8,7 @@ import { useHabitStorage } from '../../hooks/useHabitStorage';
 import { HabitCard } from '../../components/habit/HabitCard';
 import { RootStackParamList } from '../../navigation/types';
 
+
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export const HomeScreen = () => {
@@ -43,7 +44,9 @@ export const HomeScreen = () => {
     }
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View 
+            style={[styles.container, { backgroundColor: colors.background }]}
+        >
             <Text style={[styles.header, { color: colors.text }]}>My Habits</Text>
             <View style={styles.inputContainer}>
                 <TextInput
@@ -63,12 +66,14 @@ export const HomeScreen = () => {
             <FlatList
                 data={habits}
                 keyExtractor={habit => habit.id}
-                renderItem={({ item }) => (
-                    <HabitCard 
-                        habit={item} 
-                        onToggle={toggleHabit} 
-                        onPress={handleNavigateToDetail} 
-                    />
+                renderItem={({ item, index }) => (
+                    <View >
+                        <HabitCard 
+                            habit={item} 
+                            onToggle={toggleHabit} 
+                            onPress={handleNavigateToDetail} 
+                        />
+                    </View>
                 )}
                 contentContainerStyle={styles.listContent}
                 showsVerticalScrollIndicator={false}
@@ -89,5 +94,6 @@ const styles = StyleSheet.create({
     addButton: { justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20, borderRadius: 8, height: 50 },
     addButtonText: { color: '#FFF', fontWeight: 'bold', fontSize: 16 },
     listContent: { paddingBottom: 100 },
-    emptyText: { textAlign: 'center', marginTop: 40, opacity: 0.5 }
+    emptyText: { textAlign: 'center', marginTop: 40, opacity: 0.5 },
+    marginTop: { marginTop: 40, opacity: 0.5 }
 });

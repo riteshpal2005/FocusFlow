@@ -16,6 +16,8 @@ export type RootStackParamList = {
     Main: undefined;
 
     HabitDetail: { habitId: string };
+
+    About: undefined;
 };
 
 export type HabitDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'HabitDetail'>;

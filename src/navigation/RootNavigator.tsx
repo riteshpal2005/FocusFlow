@@ -8,6 +8,7 @@ import { useTheme } from "../context/ThemeContext";
 import { AuthStack } from "./AuthStack";
 import { MainTabs } from "./MainTabs";
 import { HabitDetailScreen } from "../screens/main/HabitDetailScreen";
+import { AboutScreen } from "../screens/main/AboutScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -26,11 +27,12 @@ export const RootNavigator = () => {
     return (
         <>
             <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
-            <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Navigator screenOptions={{ headerShown: false, animation: 'none' }}>
                 {user ? (
                     <>
                         <Stack.Screen name="Main" component={MainTabs} />
                         <Stack.Screen name="HabitDetail" component={HabitDetailScreen} />
+                        <Stack.Screen name="About" component={AboutScreen} />
                     </>
                 ) : (
                     <>
