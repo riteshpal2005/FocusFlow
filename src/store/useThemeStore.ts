@@ -1,58 +1,15 @@
-import { create } from 'zustand';
-import { getTheme, saveTheme } from '../utils/storageHelpers';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from './index';
+import { initializeTheme, toggleThemeAction } from './themeSlice';
 
-type ThemeMode = 'light' | 'dark';
+export const useTheme = () => {
+    const dispatch = useDispatch<AppDispatch>();
+    const { theme, colors } = useSelector((state: RootState) => state.theme);
 
-interface ThemeColors {
-	background: string;
-	surface: string;
-	text: string;
-	primary: string;
-	border: string;
-}
-
-interface ThemeStore {
-	theme: ThemeMode;
-	colors: ThemeColors;
-	initialize: () => Promise<void>;
-	toggleTheme: () => void;
-}
-
-const LightColors: ThemeColors = {
-	background: '#FFFFFF',
-    surface: '#F5F5F5',
-    text: '#121212',
-    primary: '#2563EB',
-    border: '#E5E5E5',
-}
-
-const DarkColors: ThemeColors = {
-	background: '#121212',
-    surface: '#1E1E1E',
-    text: '#FFFFFF',
-    primary: '#2563EB',
-    border: '#E5E5E5',
-}
-
-export const useTheme = create<ThemeStore>((set, get) => ({
-    theme: 'dark',
-    colors: DarkColors,
-    initialize: async () => {
-        const savedTheme = await getTheme();
-        if (savedTheme) {
-            set({ 
-                theme: savedTheme as ThemeMode, 
-                colors: savedTheme === 'dark' ? DarkColors : LightColors 
-            });
-        }
-    },
-    toggleTheme: () => {
-        const currentTheme = get().theme;
-        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-        saveTheme(newTheme);
-        set({ 
-            theme: newTheme, 
-            colors: newTheme === 'dark' ? DarkColors : LightColors 
-        });
-    }
-}));
+    return {
+        theme,
+        colors,
+        initialize: () => dispatch(initializeTheme()),
+        toggleTheme: () => dispatch(toggleThemeAction())
+    };
+};

@@ -1,14 +1,18 @@
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { useTheme } from './src/store/useThemeStore';
-import { useAuth } from './src/store/useAuthStore';
+import { Provider, useDispatch } from 'react-redux';
+import { store, AppDispatch } from './src/store';
+import { initializeAuth } from './src/store/authSlice';
+import { initializeTheme } from './src/store/themeSlice';
 import { RootNavigator } from './src/navigation/RootNavigator';
 
-export default function App() {
+const AppContent = () => {
+  const dispatch = useDispatch<AppDispatch>();
+
   useEffect(() => {
-    useTheme.getState().initialize();
-    useAuth.getState().initialize();
-  }, []);
+    dispatch(initializeTheme());
+    dispatch(initializeAuth());
+  }, [dispatch]);
 
   return (
     <NavigationContainer>
@@ -16,3 +20,11 @@ export default function App() {
     </NavigationContainer>
   );
 };
+
+export default function App() {
+  return (
+    <Provider store={store}>
+      <AppContent />
+    </Provider>
+  );
+}
