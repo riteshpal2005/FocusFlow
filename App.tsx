@@ -1,17 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { ThemeProvider } from './src/context/ThemeContext';
-import { AuthProvider } from './src/context/AuthContext';
+import { useTheme } from './src/store/useThemeStore';
+import { useAuth } from './src/store/useAuthStore';
 import { RootNavigator } from './src/navigation/RootNavigator';
 
 export default function App() {
+  useEffect(() => {
+    useTheme.getState().initialize();
+    useAuth.getState().initialize();
+  }, []);
+
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <NavigationContainer>
-          <RootNavigator />
-        </NavigationContainer>
-      </AuthProvider>
-    </ThemeProvider>
+    <NavigationContainer>
+      <RootNavigator />
+    </NavigationContainer>
   );
 };

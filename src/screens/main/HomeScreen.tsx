@@ -3,7 +3,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useTheme } from '../../context/ThemeContext';
+import { useTheme } from '../../store/useThemeStore';
 import { useHabitStorage } from '../../hooks/useHabitStorage';
 import { HabitCard } from '../../components/habit/HabitCard';
 import { RootStackParamList } from '../../navigation/types';

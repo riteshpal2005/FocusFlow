@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, ActivityIndicator, StyleSheet, TouchableOpacityProps } from 'react-native'; 
-import { useTheme } from '../../context/ThemeContext';
+import { useTheme } from '../../store/useThemeStore';
 
 interface CustomButtonProps extends TouchableOpacityProps {
     title: string;

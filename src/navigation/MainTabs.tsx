@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { MainTabParamList } from '../navigation/types';
 import { HomeScreen } from '../screens/main/HomeScreen';
 import { ProfileScreen } from '../screens/main/ProfileScreen';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../store/useThemeStore';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
