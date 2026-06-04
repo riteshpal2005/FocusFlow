@@ -3,11 +3,11 @@ import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { useTheme } from '../../store/useThemeStore';
 import { useHabitStorage } from '../../hooks/useHabitStorage';
 import { HabitCard } from '../../components/habit/HabitCard';
 import { RootStackParamList } from '../../navigation/types';
-
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -16,17 +16,17 @@ export const HomeScreen = () => {
     const navigation = useNavigation<NavigationProp>();
 
     const { habits, isLoading, addHabit, toggleHabit, refreshHabits } = useHabitStorage();
-    
+
     useFocusEffect(
-    useCallback(() => {
-        refreshHabits();
+        useCallback(() => {
+            refreshHabits();
         }, [])
     );
 
     const [newHabitName, setNewHabitName] = useState('');
-    
+
     const handleAddHabit = () => {
-        if(newHabitName.trim() === '') return;
+        if (newHabitName.trim() === '') return;
         addHabit(newHabitName);
         setNewHabitName('');
     };
@@ -44,7 +44,8 @@ export const HomeScreen = () => {
     }
 
     return (
-        <View 
+        <Animated.View
+            entering={FadeIn.duration(250)}
             style={[styles.container, { backgroundColor: colors.background }]}
         >
             <Text style={[styles.header, { color: colors.text }]}>My Habits</Text>
@@ -68,10 +69,10 @@ export const HomeScreen = () => {
                 keyExtractor={habit => habit.id}
                 renderItem={({ item, index }) => (
                     <View >
-                        <HabitCard 
-                            habit={item} 
-                            onToggle={toggleHabit} 
-                            onPress={handleNavigateToDetail} 
+                        <HabitCard
+                            habit={item}
+                            onToggle={toggleHabit}
+                            onPress={handleNavigateToDetail}
                         />
                     </View>
                 )}
@@ -81,7 +82,7 @@ export const HomeScreen = () => {
                     <Text style={[styles.emptyText, { color: colors.text }]}>No habits yet. Start building one!</Text>
                 }
             />
-        </View>
+        </Animated.View>
     );
 };
 

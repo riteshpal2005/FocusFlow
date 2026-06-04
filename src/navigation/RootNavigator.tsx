@@ -1,5 +1,5 @@
 import React from "react";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { RootStackParamList } from "./types";
 import { useAuth } from "../store/useAuthStore";
@@ -9,25 +9,22 @@ import { AuthStack } from "./AuthStack";
 import { MainTabs } from "./MainTabs";
 import { HabitDetailScreen } from "../screens/main/HabitDetailScreen";
 import { AboutScreen } from "../screens/main/AboutScreen";
+import { CustomSplashScreen } from "../components/common/CustomSplashScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export const RootNavigator = () => {
     const { user, isLoading } = useAuth();
-    const { theme } = useTheme();
+    const { theme, colors } = useTheme();
 
     if (isLoading) {
-        return (
-            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                <ActivityIndicator size="large" color="#2563EB" />
-            </View>
-        );
+        return <CustomSplashScreen />;
     }
 
     return (
         <>
             <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
-            <Stack.Navigator screenOptions={{ headerShown: false, animation: 'none' }}>
+            <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right', contentStyle: { backgroundColor: colors.background } }}>
                 {user ? (
                     <>
                         <Stack.Screen name="Main" component={MainTabs} />

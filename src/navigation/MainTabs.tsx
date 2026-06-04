@@ -14,6 +14,7 @@ export const MainTabs = () => {
         <Tab.Navigator
             screenOptions={({ route }) => ({
                 headerShown: false,
+                unmountOnBlur: true,
                 tabBarActiveTintColor: colors.primary,
                 tabBarInactiveTintColor: 'gray',
                 tabBarStyle: {

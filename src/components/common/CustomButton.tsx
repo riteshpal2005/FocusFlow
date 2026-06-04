@@ -1,8 +1,9 @@
 import React from 'react';
-import { TouchableOpacity, Text, ActivityIndicator, StyleSheet, TouchableOpacityProps } from 'react-native'; 
+import { Text, ActivityIndicator, StyleSheet, Pressable, PressableProps } from 'react-native'; 
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { useTheme } from '../../store/useThemeStore';
 
-interface CustomButtonProps extends TouchableOpacityProps {
+interface CustomButtonProps extends Omit<PressableProps, 'style'> {
     title: string;
     variant?: 'primary' | 'secondary';
     isLoading?: boolean;
@@ -13,28 +14,41 @@ export const CustomButton: React.FC<CustomButtonProps> = ({
     variant = 'primary',
     isLoading = false,
     ...rest
-
 }) => {
     const { colors } = useTheme();
+    const scale = useSharedValue(1);
+
+    const animatedStyle = useAnimatedStyle(() => {
+        return {
+            transform: [{ scale: scale.value }],
+        };
+    });
 
     const backgroundColor = variant === 'primary' ? colors.primary : colors.surface;
 
     return (
-        <TouchableOpacity
-            activeOpacity={0.8}
-            style={[styles.button, { backgroundColor: backgroundColor }, rest.disabled && { opacity: 0.5 }
-
-            ]}
-            {...rest}
-        >
-            {isLoading ? (
-                <ActivityIndicator color={variant === 'primary' ? '#FFF' : colors.text} />
-            ) : (
-                <Text style={[styles.text, { color: variant === 'primary' ? '#FFF' : colors.text }]}>
-                    {title}
-                </Text>
-            )}
-        </TouchableOpacity> 
+        <Animated.View style={[animatedStyle, rest.disabled && { opacity: 0.5 }]}>
+            <Pressable
+                style={[styles.button, { backgroundColor: backgroundColor }]}
+                onPressIn={(e) => {
+                    scale.value = withSpring(0.95, { damping: 10, stiffness: 300 });
+                    if (rest.onPressIn) rest.onPressIn(e);
+                }}
+                onPressOut={(e) => {
+                    scale.value = withSpring(1, { damping: 10, stiffness: 300 });
+                    if (rest.onPressOut) rest.onPressOut(e);
+                }}
+                {...rest}
+            >
+                {isLoading ? (
+                    <ActivityIndicator color={variant === 'primary' ? '#FFF' : colors.text} />
+                ) : (
+                    <Text style={[styles.text, { color: variant === 'primary' ? '#FFF' : colors.text }]}>
+                        {title}
+                    </Text>
+                )}
+            </Pressable> 
+        </Animated.View>
     );
 };
 

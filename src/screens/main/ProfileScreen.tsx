@@ -1,13 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
+import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
+import { useAuth } from '../../store/useAuthStore';
+import { useTheme } from '../../store/useThemeStore';
 import { CustomButton } from '../../components/common/CustomButton';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
+import Animated, { FadeIn, useSharedValue, useAnimatedStyle, withTiming, Easing } from 'react-native-reanimated';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Main'>;
 
@@ -18,20 +19,37 @@ export const ProfileScreen = () => {
     const insets = useSafeAreaInsets();
     const navigation = useNavigation<NavigationProp>();
 
+    const rotation = useSharedValue(0);
+
+    const handleThemeToggle = () => {
+        rotation.value = withTiming(rotation.value + 180, { duration: 300, easing: Easing.inOut(Easing.ease) });
+        toggleTheme();
+    };
+
+    const themeIconStyle = useAnimatedStyle(() => ({
+        transform: [{ rotate: `${rotation.value}deg` }]
+    }));
+
     return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <Animated.View 
+            entering={FadeIn.duration(250)}
+            style={[styles.container, { backgroundColor: colors.background }]}
+        >
             <Text style={[styles.header, { color: colors.text }]}>Settings & Profile</Text>
 
-            <TouchableOpacity 
-                onPress={toggleTheme}
+            <Pressable 
+                onPress={handleThemeToggle}
                 style={[styles.themeButton, { top: insets.top + 16 }]}
             >
-                <Ionicons 
-                    name={theme === 'light' ? 'moon' : 'sunny'} 
-                    size={24} 
-                    color={colors.text} 
-                />
-            </TouchableOpacity>
+                <Animated.View style={themeIconStyle}>
+                    <Ionicons 
+                        name={theme === 'light' ? 'moon' : 'sunny'} 
+                        size={24} 
+                        color={colors.text} 
+                    />
+                </Animated.View>
+            </Pressable>
+            
             <View style={[styles.card, { backgroundColor: colors.surface }]}>
                 <Text style={styles.label}>Logged in as</Text>
                 <Text style={[styles.username, { color: colors.text }]}>{user?.username}</Text>
@@ -54,7 +72,7 @@ export const ProfileScreen = () => {
                     isLoading={isLoggingOut}
                 />
             </View>
-        </View>
+        </Animated.View>
     );
 };
 
