@@ -47,3 +47,5 @@ eas.json
 
 # Sandbox
 /test
+
+*.md
