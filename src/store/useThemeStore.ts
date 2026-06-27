@@ -13,8 +13,8 @@ export interface ThemeColors {
 }
 
 const LightColors: ThemeColors = {
-	background: '#FFFFFF',
-    surface: '#F5F5F5',
+	background: '#F5F5F5',
+    surface: '#FFFFFF',
     text: '#121212',
     primary: '#2563EB',
     border: '#E5E5E5',
@@ -25,7 +25,7 @@ const DarkColors: ThemeColors = {
     surface: '#1E1E1E',
     text: '#FFFFFF',
     primary: '#2563EB',
-    border: '#E5E5E5',
+    border: '#333333',
 };
 
 const themeModeAtom = atom<ThemeMode>('dark');

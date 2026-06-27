@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, StyleSheet, TextInputProps } from 'react-native';
+import { View, TextInput, Text, TextInputProps } from 'react-native';
 import { useTheme } from '../../store/useThemeStore';
 
 interface CustomInputProps extends TextInputProps {
@@ -14,46 +14,26 @@ export const CustomInput: React.FC<CustomInputProps> = ({
 }) => {
     const { colors } = useTheme();
     const [isFocused, setIsFocused] = useState(false);
-    const borderColor = error ? '#EF4444' : isFocused ? colors.primary : colors.border;
+
+    const inputClass = `h-[50px] border rounded-lg px-4 text-base bg-surface text-text ${
+        error ? 'border-[#EF4444]' : isFocused ? 'border-primary' : 'border-border'
+    }`;
 
     return (
-        <View style={styles.container}>
+        <View className="mb-4">
             {label && (
-                <Text style={[styles.label, { color: colors.text }]}>
+                <Text className="mb-2 text-sm font-medium text-text">
                     {label}
                 </Text>
             )}
             <TextInput 
-                style={[styles.input, { backgroundColor: colors.surface, borderColor: borderColor, color: colors.text }]}
-                placeholderTextColor={'gray'}
+                className={inputClass}
+                placeholderTextColor="gray"
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
                 {...rest}
             />
-            {error && <Text style={styles.errorText}>{error}</Text>}
+            {error && <Text className="text-[#EF4444] text-xs mt-1">{error}</Text>}
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        marginBottom: 16,
-    },
-    label: {
-        marginBottom: 8,
-        fontSize: 14,
-        fontWeight: '500',
-    },
-    input: {
-        height: 50,
-        borderWidth: 1,
-        borderRadius: 8,
-        paddingHorizontal: 16,
-        fontSize: 16,
-    },
-    errorText: {
-        color: '#EF4444',
-        fontSize: 12,
-        marginTop: 4,
-    }
-});

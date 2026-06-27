@@ -1,10 +1,8 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, Text } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing, withSequence } from 'react-native-reanimated';
-import { useTheme } from '../../store/useThemeStore';
 
 export const CustomSplashScreen = () => {
-    const { colors } = useTheme();
     const scale = useSharedValue(0.8);
     const opacity = useSharedValue(0.5);
 
@@ -33,35 +31,13 @@ export const CustomSplashScreen = () => {
     }));
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <Animated.View style={[styles.logoContainer, animatedStyle, { backgroundColor: colors.surface, borderColor: colors.primary }]}>
-                <Text style={[styles.logoText, { color: colors.primary }]}>FF</Text>
+        <View className="flex-1 justify-center items-center bg-background">
+            <Animated.View 
+                style={animatedStyle}
+                className="w-[100px] h-[100px] rounded-full justify-center items-center border-4 border-primary bg-surface shadow-lg shadow-black/30 elevation-10"
+            >
+                <Text className="text-[36px] font-black text-primary">FF</Text>
             </Animated.View>
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    logoContainer: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 4,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 10,
-    },
-    logoText: {
-        fontSize: 36,
-        fontWeight: '900',
-    }
-});
