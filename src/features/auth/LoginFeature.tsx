@@ -1,11 +1,12 @@
 import React, { useCallback, useState } from 'react';
-import { KeyboardAvoidingView, Platform, TouchableOpacity, View, Text } from 'react-native';
+import { KeyboardAvoidingView, Platform, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../../store/useAuthStore';
-import { useTheme } from '../../store/useThemeStore';
-import { CustomButton } from '../../components/common/CustomButton';
-import { CustomInput } from '../../components/common/CustomInput';
+import { useAuth } from '../../core/auth/useAuthStore';
+import { useTheme } from '../../core/theme/useThemeStore';
+import { Button } from '../../shared/components/ui/Button';
+import { Input } from '../../shared/components/ui/Input';
+import { Heading } from '../../shared/components/ui/Typography';
 
 export const LoginFeature = () => {
   const { login, isLoading } = useAuth();
@@ -17,7 +18,7 @@ export const LoginFeature = () => {
 
   const handleLogin = useCallback(async () => {
     if (!username || !password) return;
-    await login(username);
+    await login(username, password);
   }, [login, password, username]);
 
   return (
@@ -34,9 +35,9 @@ export const LoginFeature = () => {
       </TouchableOpacity>
 
       <View className="px-6">
-        <Text className="text-[28px] font-bold mb-8 text-center text-text">Welcome to FocusFlow</Text>
+        <Heading className="mb-8 text-center text-text">Welcome to FocusFlow</Heading>
 
-        <CustomInput
+        <Input
           label="Username"
           placeholder="Enter your username"
           value={username}
@@ -44,7 +45,7 @@ export const LoginFeature = () => {
           autoCapitalize="none"
         />
 
-        <CustomInput
+        <Input
           label="Password"
           placeholder="Enter your password"
           value={password}
@@ -53,10 +54,10 @@ export const LoginFeature = () => {
           secureTextEntry
         />
 
-        <CustomButton
+        <Button
           title="Sign In"
           onPress={handleLogin}
-          isLoading={isLoading}
+          loading={isLoading}
           disabled={!username || !password}
         />
       </View>

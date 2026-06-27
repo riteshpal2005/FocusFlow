@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRouter } from 'expo-router';
-import { SwipeableScreen } from '../../components/common/SwipeableScreen';
+import { SwipeableScreen } from '../../shared/components/common/SwipeableScreen';
 import { ProfileFeature } from '../../features/profile';
 
 export default function ProfilePage() {

@@ -1,7 +1,8 @@
 import React from 'react';
-import { FlatList, Text, View } from 'react-native';
-import { HabitCard } from '../../components/habit/HabitCard';
-import { Habit } from '../../utils/storageHelpers';
+import { Text, View } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+import { HabitCard } from './components/HabitCard';
+import { Habit } from '../../shared/utils/storageHelpers';
 
 interface HabitListSectionProps {
   habits: Habit[];
@@ -9,16 +10,19 @@ interface HabitListSectionProps {
   onPress: (id: string) => void;
 }
 
+const FlashListElement = FlashList as any;
+
 export const HabitListSection: React.FC<HabitListSectionProps> = ({ habits, onToggle, onPress }) => {
   return (
-    <FlatList
+    <FlashListElement
       data={habits}
-      keyExtractor={(habit) => habit.id}
-      renderItem={({ item }) => (
+      keyExtractor={(habit: Habit) => habit.id}
+      renderItem={({ item }: { item: Habit }) => (
         <View>
           <HabitCard habit={item} onToggle={onToggle} onPress={onPress} />
         </View>
       )}
+      estimatedItemSize={72}
       contentContainerClassName="pb-[100px]"
       showsVerticalScrollIndicator={false}
       ListEmptyComponent={

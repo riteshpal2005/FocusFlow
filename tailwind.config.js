@@ -5,11 +5,18 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        surface: "var(--surface)",
-        text: "var(--text)",
-        primary: "var(--primary)",
-        border: "var(--border)",
+        background: 'var(--color-background)',
+        surface: 'var(--color-surface)',
+        border: 'var(--color-border)',
+        text: 'var(--color-text-primary)',
+        primary: 'var(--color-brand-primary)',
+        bordercolor: 'var(--color-border)',
+        secondary: 'var(--color-text-secondary)',
+        tertiary: 'var(--color-text-tertiary)',
+        'brand-primary': 'var(--color-brand-primary)',
+        'brand-primary-content': 'var(--color-brand-primary-content)',
+        'status-danger': 'var(--color-status-danger)',
+        'status-success': 'var(--color-status-success)',
       },
     },
   },

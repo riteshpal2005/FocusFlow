@@ -4,10 +4,11 @@ import { useFocusEffect } from '@react-navigation/native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../../store/useThemeStore';
-import { useHabitStorage } from '../../hooks/useHabitStorage';
+import { useTheme } from '../../core/theme/useThemeStore';
+import { useHabitStorage } from './hooks/useHabitStorage';
 import { HabitInputSection } from './HabitInputSection';
 import { HabitListSection } from './HabitListSection';
+import { FAB } from '../../shared/components/ui/FAB';
 
 const HomeFeature = () => {
   const { colors } = useTheme();
@@ -38,27 +39,25 @@ const HomeFeature = () => {
 
   if (isLoading) {
     return (
-      <View className="flex-1 justify-center items-center bg-background"> 
+      <View className="flex-1 justify-center items-center bg-background">
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
-    <Animated.View entering={FadeIn.duration(250)} className="flex-1 px-4 pt-[60px] bg-background"> 
+    <Animated.View entering={FadeIn.duration(250)} className="flex-1 px-4 pt-[60px] bg-background">
       <View className="flex-row justify-between items-center mb-5">
         <Text className="text-[28px] font-bold text-text">My Habits</Text>
       </View>
 
       <HabitListSection habits={habits} onToggle={toggleHabit} onPress={handleNavigateToDetail} />
 
-      <TouchableOpacity
-        activeOpacity={0.8}
-        className="absolute bottom-[30px] right-6 w-14 h-14 rounded-full justify-center items-center bg-primary shadow-lg shadow-black/30 elevation-6"
+      <FAB
+        icon={<Ionicons name="add" size={30} color="#FFFFFF" />}
         onPress={() => setIsModalVisible(true)}
-      >
-        <Ionicons name="add" size={30} color="#FFFFFF" />
-      </TouchableOpacity>
+        className="w-14 h-14"
+      />
 
       <Modal
         visible={isModalVisible}

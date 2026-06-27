@@ -49,3 +49,5 @@ eas.json
 /test
 
 *.md
+
+.env

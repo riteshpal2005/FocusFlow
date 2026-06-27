@@ -6,21 +6,17 @@ const STORAGE_KEYS = {
     HABITS: '@focusflow_habits',
 } as const;
 
-export const saveTheme = async (theme: 'light' | 'dark'): Promise<void> => {
+export const saveTheme = async (theme: string): Promise<void> => {
     try {
-        AsyncStorage.setItem(STORAGE_KEYS.THEME, theme);
+        await AsyncStorage.setItem(STORAGE_KEYS.THEME, theme);
     } catch (error) {
         console.error("Failed to save theme to disk:", error);
     }
 };
 
-export const getTheme = async (): Promise<'light' | 'dark' | null> => {
+export const getTheme = async (): Promise<string | null> => {
     try {
-        const theme = await AsyncStorage.getItem(STORAGE_KEYS.THEME);
-        if (theme === 'light' || theme === 'dark') {
-            return theme;
-        }
-        return null;
+        return await AsyncStorage.getItem(STORAGE_KEYS.THEME);
     } catch (error) {
         return null;
     }
@@ -29,15 +25,17 @@ export const getTheme = async (): Promise<'light' | 'dark' | null> => {
 interface User {
     id: string;
     username: string;
-};
+}
 
 export interface Habit {
     id: string;
     name: string;
     streak: number;
     completedToday: boolean;
-    createdAt: number; // unix timestamp
-};
+    createdAt: number;
+    sync_status?: 'synced' | 'pending' | 'deleted';
+    updatedAt: number;
+}
 
 export const saveHabits = async (habits: Habit[]): Promise<void> => {
     try {
@@ -66,7 +64,6 @@ export const saveUser = async (user: User): Promise<void> => {
     } catch (error) {
         console.error("Failed to save user to disk:", error);
     }
-
 };
 
 export const getUser = async (): Promise<User | null> => {
@@ -81,10 +78,10 @@ export const getUser = async (): Promise<User | null> => {
     }
 };
 
-export const clearAuthStorage = async ():  Promise<void> => {
+export const clearAuthStorage = async (): Promise<void> => {
     try {
         await AsyncStorage.removeItem(STORAGE_KEYS.USER);
     } catch (error) {
         console.error("Failed to clear user from disk:", error);
     }
-}; 
+};
