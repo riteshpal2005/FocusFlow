@@ -50,7 +50,7 @@ const HomeFeature = () => {
   }
 
   return (
-    <Animated.View entering={FadeIn.duration(250)} className="flex-1 px-4 pt-[60px] bg-background">
+    <Animated.View entering={FadeIn.duration(250)} className="flex-1 px-4 pt-[72px] bg-background">
       <View className="flex-row justify-between items-center mb-5">
         <Text className="text-[28px] font-bold text-text">My Habits</Text>
       </View>

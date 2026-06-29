@@ -16,7 +16,7 @@ export const AboutFeature = () => {
 
   return (
     <ScrollView className="flex-1 bg-background">
-      <View className="flex-row items-center px-4 pt-[60px] pb-6">
+      <View className="flex-row items-center px-4 pt-[72px] pb-6">
         <TouchableOpacity onPress={() => router.back()} className="mr-4">
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>

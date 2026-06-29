@@ -28,7 +28,7 @@ export const ProfileFeature = () => {
   }, [rotation, toggleTheme]);
 
   return (
-    <Animated.View entering={FadeIn.duration(250)} className="flex-1 px-4 pt-[60px] bg-background">
+    <Animated.View entering={FadeIn.duration(250)} className="flex-1 px-4 pt-[72px] bg-background">
       <Text className="text-[28px] font-bold text-text mb-6">Settings & Profile</Text>
 
       <Pressable

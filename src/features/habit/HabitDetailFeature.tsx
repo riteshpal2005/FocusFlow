@@ -59,7 +59,7 @@ export const HabitDetailFeature = () => {
 
   if (!habit) {
     return (
-      <View className="flex-1 pt-[50px] px-4 bg-background">
+      <View className="flex-1 pt-[62px] px-4 bg-background">
         <Text className="text-base mt-4 text-center text-text">Habit not found.</Text>
         <TouchableOpacity onPress={() => router.back()} className="mt-5 p-[10px]">
           <Text className="text-base text-text">Go Back</Text>
@@ -69,7 +69,7 @@ export const HabitDetailFeature = () => {
   }
 
   return (
-    <View className="flex-1 pt-[50px] px-4 bg-background">
+    <View className="flex-1 pt-[62px] px-4 bg-background">
       <View className="flex-row justify-between items-center mb-6">
         <TouchableOpacity onPress={() => router.back()} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
