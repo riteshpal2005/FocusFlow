@@ -10,7 +10,7 @@ if (!isExpoGo) {
         const { MMKV } = require('react-native-mmkv');
         mmkv = new MMKV({ id: 'focusflow-storage' });
     } catch (error) {
-        console.error(error);
+        console.warn("MMKV native module not found, falling back to AsyncStorage:", error);
     }
 }
 

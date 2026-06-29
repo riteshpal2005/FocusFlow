@@ -26,7 +26,10 @@ function AppLayoutContent() {
   }, []);
 
   useEffect(() => {
-    initializeTheme()
+    Promise.all([
+      initializeTheme(),
+      new Promise((resolve) => setTimeout(resolve, 1500))
+    ])
       .then(() => {
         setIsThemeLoaded(true);
       })
@@ -65,10 +68,6 @@ function AppLayoutContent() {
       });
     }
   }, [isThemeLoaded, isLoading]);
-
-  if (!isThemeLoaded || isLoading) {
-    return null;
-  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.background }}>

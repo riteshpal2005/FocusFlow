@@ -6,6 +6,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+
     "userInterfaceStyle": "dark",
     "ios": {
       "supportsTablet": true,
@@ -27,9 +28,9 @@
       [
         "expo-splash-screen",
         {
+          "backgroundColor": "#09090b",
           "image": "./assets/splash-icon.png",
-          "resizeMode": "contain",
-          "backgroundColor": "#09090b"
+          "imageWidth": 250
         }
       ],
       "expo-router"
