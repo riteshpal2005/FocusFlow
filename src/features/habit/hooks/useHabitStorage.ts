@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getHabits, saveHabits, Habit, RecurrenceFrequency } from '../../../shared/utils/storageHelpers';
+import { checkAndResetHabits } from '../../../shared/utils/recurrenceHelpers';
 import { useAuth } from '../../../core/auth/useAuthStore';
 import { SyncService } from '../../../core/services/syncService';
 
@@ -11,12 +12,19 @@ export const useHabitStorage = () => {
   const loadInitialData = useCallback(async () => {
     setIsLoading(true);
     const savedHabits = await getHabits();
-    setHabits(savedHabits.filter((h) => h.sync_status !== 'deleted'));
+    
+    const { updated, changed } = checkAndResetHabits(savedHabits, new Date());
+    if (changed) {
+      await saveHabits(updated);
+    }
+
+    setHabits(updated.filter((h) => h.sync_status !== 'deleted'));
     setIsLoading(false);
 
     if (user) {
       await SyncService.syncAll(user.id, (updatedHabits) => {
-        setHabits(updatedHabits.filter((h) => h.sync_status !== 'deleted'));
+        const { updated: syncedUpdated } = checkAndResetHabits(updatedHabits, new Date());
+        setHabits(syncedUpdated.filter((h) => h.sync_status !== 'deleted'));
       });
     }
   }, [user]);
@@ -60,11 +68,15 @@ export const useHabitStorage = () => {
 
   const toggleHabit = async (id: string) => {
     const currentHabits = await getHabits();
+    const todayStr = new Date().toISOString().split('T')[0];
     const updatedHabits = currentHabits.map((habit) => {
       if (habit.id === id) {
+        const nextCompleted = !habit.completedToday;
         return {
           ...habit,
-          completedToday: !habit.completedToday,
+          completedToday: nextCompleted,
+          streak: nextCompleted ? habit.streak + 1 : Math.max(0, habit.streak - 1),
+          lastCompletedDate: nextCompleted ? todayStr : undefined,
           updatedAt: Date.now(),
           sync_status: user ? ('pending' as const) : ('synced' as const),
         };
