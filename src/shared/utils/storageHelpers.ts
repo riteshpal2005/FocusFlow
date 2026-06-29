@@ -1,4 +1,41 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
+
+const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+
+let mmkv: any = null;
+
+if (!isExpoGo) {
+    try {
+        const { MMKV } = require('react-native-mmkv');
+        mmkv = new MMKV({ id: 'focusflow-storage' });
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+const kvStorage = {
+    getItem: async (key: string): Promise<string | null> => {
+        if (mmkv) {
+            return mmkv.getString(key) ?? null;
+        }
+        return AsyncStorage.getItem(key);
+    },
+    setItem: async (key: string, value: string): Promise<void> => {
+        if (mmkv) {
+            mmkv.set(key, value);
+            return;
+        }
+        await AsyncStorage.setItem(key, value);
+    },
+    removeItem: async (key: string): Promise<void> => {
+        if (mmkv) {
+            mmkv.delete(key);
+            return;
+        }
+        await AsyncStorage.removeItem(key);
+    }
+};
 
 const STORAGE_KEYS = {
     THEME: '@focucsflow_theme',
@@ -9,7 +46,7 @@ const STORAGE_KEYS = {
 
 export const saveTheme = async (theme: string): Promise<void> => {
     try {
-        await AsyncStorage.setItem(STORAGE_KEYS.THEME, theme);
+        await kvStorage.setItem(STORAGE_KEYS.THEME, theme);
     } catch (error) {
         console.error("Failed to save theme to disk:", error);
     }
@@ -17,7 +54,7 @@ export const saveTheme = async (theme: string): Promise<void> => {
 
 export const getTheme = async (): Promise<string | null> => {
     try {
-        return await AsyncStorage.getItem(STORAGE_KEYS.THEME);
+        return await kvStorage.getItem(STORAGE_KEYS.THEME);
     } catch (error) {
         return null;
     }
@@ -49,15 +86,15 @@ export interface ChecklistItem {
 
 export const saveHabits = async (habits: Habit[]): Promise<void> => {
     try {
-        await AsyncStorage.setItem(STORAGE_KEYS.HABITS, JSON.stringify(habits));
+        await kvStorage.setItem(STORAGE_KEYS.HABITS, JSON.stringify(habits));
     } catch (error) {
-        console.error("Failed to save habits to disk:", error);
+        console.error("Failed to habits to disk:", error);
     }
 };
 
 export const getHabits = async (): Promise<Habit[]> => {
     try {
-        const habits = await AsyncStorage.getItem(STORAGE_KEYS.HABITS);
+        const habits = await kvStorage.getItem(STORAGE_KEYS.HABITS);
         if (habits) {
             return JSON.parse(habits);
         }
@@ -70,7 +107,7 @@ export const getHabits = async (): Promise<Habit[]> => {
 
 export const saveChecklistItems = async (items: ChecklistItem[]): Promise<void> => {
     try {
-        await AsyncStorage.setItem(STORAGE_KEYS.CHECKLIST, JSON.stringify(items));
+        await kvStorage.setItem(STORAGE_KEYS.CHECKLIST, JSON.stringify(items));
     } catch (error) {
         console.error("Failed to save checklist items to disk:", error);
     }
@@ -78,7 +115,7 @@ export const saveChecklistItems = async (items: ChecklistItem[]): Promise<void> 
 
 export const getChecklistItems = async (): Promise<ChecklistItem[]> => {
     try {
-        const items = await AsyncStorage.getItem(STORAGE_KEYS.CHECKLIST);
+        const items = await kvStorage.getItem(STORAGE_KEYS.CHECKLIST);
         if (items) {
             return JSON.parse(items);
         }
@@ -91,7 +128,7 @@ export const getChecklistItems = async (): Promise<ChecklistItem[]> => {
 
 export const saveUser = async (user: User): Promise<void> => {
     try {
-        await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+        await kvStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
     } catch (error) {
         console.error("Failed to save user to disk:", error);
     }
@@ -99,7 +136,7 @@ export const saveUser = async (user: User): Promise<void> => {
 
 export const getUser = async (): Promise<User | null> => {
     try {
-        const user = await AsyncStorage.getItem(STORAGE_KEYS.USER);
+        const user = await kvStorage.getItem(STORAGE_KEYS.USER);
         if (user) {
             return JSON.parse(user);
         }
@@ -111,7 +148,7 @@ export const getUser = async (): Promise<User | null> => {
 
 export const clearAuthStorage = async (): Promise<void> => {
     try {
-        await AsyncStorage.removeItem(STORAGE_KEYS.USER);
+        await kvStorage.removeItem(STORAGE_KEYS.USER);
     } catch (error) {
         console.error("Failed to clear user from disk:", error);
     }
