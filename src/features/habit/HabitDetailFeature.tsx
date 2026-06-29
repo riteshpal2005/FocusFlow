@@ -19,6 +19,24 @@ export const HabitDetailFeature = () => {
     [habits, habitId]
   );
 
+  const scheduleString = useMemo(() => {
+    if (!habit) return '';
+    switch (habit.frequency) {
+      case 'daily':
+        return 'Repeats daily';
+      case 'weekly':
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const weeklyDays = habit.daysOfWeek?.map(d => dayNames[d]).join(', ') || '';
+        return `Repeats weekly on ${weeklyDays}`;
+      case 'monthly':
+        return `Repeats monthly on day ${habit.daysOfMonth?.join(', ') || ''}`;
+      case 'custom':
+        return `Repeats every ${habit.customInterval || 1} day${(habit.customInterval || 1) > 1 ? 's' : ''}`;
+      default:
+        return '';
+    }
+  }, [habit]);
+
   const handleDeleteConfirm = () => {
     deleteHabit(habitId);
     setIsDeleteModalVisible(false);
@@ -58,6 +76,7 @@ export const HabitDetailFeature = () => {
         <Text className="text-[28px] font-bold text-text mb-4">{habit.name}</Text>
         <Text className="text-base text-text mb-2 opacity-80">Streak: {habit.streak} days</Text>
         <Text className="text-base text-text mb-2 opacity-80">Status today: {habit.completedToday ? '✅ Completed' : '❌ Pending'}</Text>
+        <Text className="text-base text-text mb-2 opacity-80">Schedule: {scheduleString}</Text>
         <Text className="text-base text-text mb-2 opacity-80">Created: {new Date(habit.createdAt).toLocaleDateString()}</Text>
 
         <TouchableOpacity onPress={() => setIsDeleteModalVisible(true)} className="mt-[30px] p-[15px] items-center">
