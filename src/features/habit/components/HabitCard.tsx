@@ -28,22 +28,18 @@ export const HabitCard: React.FC<HabitCardProps> = memo(({ habit, onToggle, onPr
   const targetText = habit.streak > 0 ? `${habit.streak} Day Streak • ` : '';
 
   useEffect(() => {
-    if (!targetText) {
-      setDisplayedStreak('');
-      return;
-    }
-
-    let currentIdx = 0;
-    setDisplayedStreak('');
-
     const interval = setInterval(() => {
-      currentIdx++;
-      if (currentIdx <= targetText.length) {
-        setDisplayedStreak(targetText.substring(0, currentIdx));
-      } else {
-        clearInterval(interval);
-      }
-    }, 30);
+      setDisplayedStreak((prev) => {
+        if (prev === targetText) {
+          return prev;
+        }
+        if (targetText.startsWith(prev) && prev.length < targetText.length) {
+          return targetText.substring(0, prev.length + 1);
+        } else {
+          return prev.substring(0, prev.length - 1);
+        }
+      });
+    }, 20);
 
     return () => clearInterval(interval);
   }, [targetText]);
