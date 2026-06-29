@@ -7,8 +7,10 @@ import { Provider } from 'jotai';
 import { useColorScheme } from 'nativewind';
 import { useAuth } from '../core/auth/useAuthStore';
 import { useTheme } from '../core/theme/useThemeStore';
-import { CustomSplashScreen } from '../shared/components/common/CustomSplashScreen';
+import * as SplashScreen from 'expo-splash-screen';
 import '../../global.css';
+
+SplashScreen.preventAutoHideAsync();
 
 function AppLayoutContent() {
   const { initialize: initializeTheme, theme, colors, activeThemeClass } = useTheme();
@@ -49,15 +51,16 @@ function AppLayoutContent() {
     }
   }, [hasMounted, isLoading, user, pathname, router]);
 
-  const [isSplashVisible, setIsSplashVisible] = useState(true);
+  useEffect(() => {
+    if (!isLoading) {
+      SplashScreen.hideAsync().catch((error) => {
+        console.warn("Failed to hide splash screen:", error);
+      });
+    }
+  }, [isLoading]);
 
-  if (isSplashVisible) {
-    return (
-      <CustomSplashScreen
-        isLoading={isLoading}
-        onAnimationComplete={() => setIsSplashVisible(false)}
-      />
-    );
+  if (isLoading) {
+    return null;
   }
 
   return (
