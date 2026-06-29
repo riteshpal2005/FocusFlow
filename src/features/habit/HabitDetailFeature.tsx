@@ -6,18 +6,24 @@ import { useTheme } from '../../core/theme/useThemeStore';
 import { useHabitStorage } from './hooks/useHabitStorage';
 import { Card } from '../../shared/components/ui/Card';
 import { DeleteConfirmationModal } from '../../shared/components/DeleteConfirmationModal';
+import { isHabitScheduled } from '../../shared/utils/recurrenceHelpers';
 
 export const HabitDetailFeature = () => {
   const { colors } = useTheme();
   const router = useRouter();
   const { habitId } = useLocalSearchParams<{ habitId: string }>();
-  const { habits, isLoading, deleteHabit } = useHabitStorage();
+  const { habits, isLoading, toggleHabit, deleteHabit } = useHabitStorage();
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
   const habit = useMemo(
     () => habits.find((item) => item.id === habitId),
     [habits, habitId]
   );
+
+  const isScheduledToday = useMemo(() => {
+    if (!habit) return false;
+    return isHabitScheduled(habit, new Date());
+  }, [habit]);
 
   const scheduleString = useMemo(() => {
     if (!habit) return '';
@@ -87,8 +93,53 @@ export const HabitDetailFeature = () => {
         </View>
       </View>
 
+      {isScheduledToday ? (
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => toggleHabit(habit.id)}
+          className={`flex-row items-center p-4 rounded-xl mb-6 border ${
+            habit.completedToday
+              ? 'bg-green-500/10 border-green-500/30'
+              : 'bg-primary/10 border-primary/30'
+          }`}
+        >
+          <View style={{ marginRight: 12 }}>
+            <Ionicons
+              name={habit.completedToday ? 'checkmark-circle' : 'ellipse-outline'}
+              size={24}
+              color={habit.completedToday ? '#22C55E' : colors.primary}
+            />
+          </View>
+          <View className="flex-1">
+            <Text
+              className={`font-semibold text-base ${
+                habit.completedToday ? 'text-green-600 dark:text-green-400' : 'text-primary'
+              }`}
+            >
+              {habit.completedToday ? 'Completed for Today!' : 'Mark Completed Today'}
+            </Text>
+            <Text className="text-text text-xs opacity-60 mt-0.5">
+              {habit.completedToday ? 'Great job! Tap to undo completion.' : 'Tap to mark this routine as done.'}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      ) : (
+        <View className="flex-row items-center p-4 rounded-xl mb-6 border border-zinc-500/20 bg-zinc-500/10">
+          <View style={{ marginRight: 12 }}>
+            <Ionicons name="calendar-outline" size={24} color="gray" style={{ opacity: 0.7 }} />
+          </View>
+          <View className="flex-1">
+            <Text className="font-semibold text-base text-text opacity-70">
+              Off-Day Today
+            </Text>
+            <Text className="text-text text-xs opacity-50 mt-0.5">
+              Enjoy your off day! Not scheduled for today.
+            </Text>
+          </View>
+        </View>
+      )}
+
       <Card padding="lg" className="shadow-lg shadow-black/10 elevation-5">
-        <Text className="text-base text-text mb-2 opacity-80">Status today: {habit.completedToday ? '✅ Completed' : '❌ Pending'}</Text>
         <Text className="text-base text-text mb-2 opacity-80">Schedule: {scheduleString}</Text>
         <Text className="text-base text-text mb-2 opacity-80">Created: {new Date(habit.createdAt).toLocaleDateString()}</Text>
       </Card>
