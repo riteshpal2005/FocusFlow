@@ -17,10 +17,36 @@ export default function TabsLayout() {
           borderTopColor: colors.border || '#333',
         },
         tabBarIcon: ({ color, size }) => {
-          const iconName = route.name === 'home' ? 'home-outline' : 'person-outline';
+          let iconName = 'home-outline';
+          if (route.name === 'home') {
+            iconName = 'home-outline';
+          } else if (route.name === 'checklist') {
+            iconName = 'checkbox-outline';
+          } else if (route.name === 'profile') {
+            iconName = 'person-outline';
+          }
           return <Ionicons name={iconName as any} size={size} color={color} />;
         },
       })}
-    />
+    >
+      <Tabs.Screen
+        name="home"
+        options={{
+          title: 'Habits',
+        }}
+      />
+      <Tabs.Screen
+        name="checklist"
+        options={{
+          title: 'Checklist',
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+        }}
+      />
+    </Tabs>
   );
 }
