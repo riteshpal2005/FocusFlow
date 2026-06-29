@@ -9,12 +9,12 @@ import { useHabitStorage } from './hooks/useHabitStorage';
 import { HabitInputSection } from './HabitInputSection';
 import { HabitListSection } from './HabitListSection';
 import { FAB } from '../../shared/components/ui/FAB';
+import { RecurrenceFrequency } from '../../shared/utils/storageHelpers';
 
 const HomeFeature = () => {
   const { colors } = useTheme();
   const router = useRouter();
   const { habits, isLoading, addHabit, toggleHabit, refreshHabits } = useHabitStorage();
-  const [newHabitName, setNewHabitName] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   useFocusEffect(
@@ -23,12 +23,16 @@ const HomeFeature = () => {
     }, [refreshHabits])
   );
 
-  const handleAddHabit = useCallback(() => {
-    if (newHabitName.trim() === '') return;
-    addHabit(newHabitName);
-    setNewHabitName('');
+  const handleAddHabit = useCallback((
+    name: string,
+    frequency: RecurrenceFrequency,
+    daysOfWeek?: number[],
+    daysOfMonth?: number[],
+    customInterval?: number
+  ) => {
+    addHabit(name, frequency, daysOfWeek, daysOfMonth, customInterval);
     setIsModalVisible(false);
-  }, [addHabit, newHabitName]);
+  }, [addHabit]);
 
   const handleNavigateToDetail = useCallback(
     (id: string) => {
@@ -77,7 +81,7 @@ const HomeFeature = () => {
                   <Ionicons name="close" size={24} color={colors.text} />
                 </TouchableOpacity>
               </View>
-              <HabitInputSection value={newHabitName} onChangeText={setNewHabitName} onSubmit={handleAddHabit} />
+              <HabitInputSection onSubmit={handleAddHabit} />
             </Pressable>
           </KeyboardAvoidingView>
         </Pressable>
