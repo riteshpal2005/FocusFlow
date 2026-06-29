@@ -1,4 +1,4 @@
-import React, { memo, useEffect } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Habit } from '../../../shared/utils/storageHelpers';
@@ -15,6 +15,7 @@ interface HabitCardProps {
 export const HabitCard: React.FC<HabitCardProps> = memo(({ habit, onToggle, onPress }) => {
   const { colors } = useTheme();
   const scale = useSharedValue(1);
+  const [displayedStreak, setDisplayedStreak] = useState('');
 
   useEffect(() => {
     if (habit.completedToday) {
@@ -23,6 +24,29 @@ export const HabitCard: React.FC<HabitCardProps> = memo(({ habit, onToggle, onPr
       scale.value = withSequence(withSpring(0.8), withSpring(1));
     }
   }, [habit.completedToday, scale]);
+
+  const targetText = habit.streak > 0 ? `${habit.streak} Day Streak • ` : '';
+
+  useEffect(() => {
+    if (!targetText) {
+      setDisplayedStreak('');
+      return;
+    }
+
+    let currentIdx = 0;
+    setDisplayedStreak('');
+
+    const interval = setInterval(() => {
+      currentIdx++;
+      if (currentIdx <= targetText.length) {
+        setDisplayedStreak(targetText.substring(0, currentIdx));
+      } else {
+        clearInterval(interval);
+      }
+    }, 30);
+
+    return () => clearInterval(interval);
+  }, [targetText]);
 
   const checkmarkStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }]
@@ -61,9 +85,9 @@ export const HabitCard: React.FC<HabitCardProps> = memo(({ habit, onToggle, onPr
             <Text className="text-lg font-semibold text-text mb-1">
               {habit.name}
             </Text>
-            <Text className="text-sm font-medium text-primary">
-              {habit.streak > 0 ? `${habit.streak} Day Streak • ` : ''}
-              <Text className="text-text text-xs" style={{ opacity: 0.5 }}>
+            <Text className="text-xs font-semibold text-primary">
+              {displayedStreak}
+              <Text className="text-text font-medium" style={{ opacity: 0.5 }}>
                 {recurrenceText}
               </Text>
             </Text>
