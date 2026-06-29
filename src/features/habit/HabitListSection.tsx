@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
+import { Ionicons } from '@expo/vector-icons';
 import { HabitCard } from './components/HabitCard';
 import { Habit } from '../../shared/utils/storageHelpers';
 
@@ -23,10 +24,14 @@ export const HabitListSection: React.FC<HabitListSectionProps> = ({ habits, onTo
         </View>
       )}
       estimatedItemSize={72}
-      contentContainerClassName="pb-[100px]"
+      contentContainerStyle={habits.length === 0 ? { flexGrow: 1, justifyContent: 'center' } : { paddingBottom: 100 }}
       showsVerticalScrollIndicator={false}
       ListEmptyComponent={
-        <Text className="text-center mt-10 opacity-50 text-text">No habits yet. Start building one!</Text>
+        <View className="items-center px-8">
+          <Ionicons name="calendar-outline" size={64} color="gray" className="opacity-40 mb-4" />
+          <Text className="text-center opacity-50 text-text text-lg font-semibold mb-2">No habits yet</Text>
+          <Text className="text-center opacity-40 text-text text-sm">Start building positive routines by adding your first habit.</Text>
+        </View>
       }
     />
   );

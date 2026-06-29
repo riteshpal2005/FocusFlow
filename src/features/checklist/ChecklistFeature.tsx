@@ -164,10 +164,10 @@ export const ChecklistFeature = () => {
           />
         )}
         estimatedItemSize={64}
-        contentContainerClassName="pb-[100px]"
+        contentContainerStyle={checklistItems.length === 0 ? { flexGrow: 1, justifyContent: 'center' } : { paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          <View className="items-center mt-20 px-8">
+          <View className="items-center px-8">
             <Ionicons name="briefcase-outline" size={64} color="gray" className="opacity-40 mb-4" />
             <Text className="text-center opacity-50 text-text text-lg font-semibold mb-2">No items listed</Text>
             <Text className="text-center opacity-40 text-text text-sm">Add items you want to take with you (keys, wallet, phone, etc.) when leaving the house.</Text>
