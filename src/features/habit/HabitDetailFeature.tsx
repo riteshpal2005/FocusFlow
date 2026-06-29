@@ -194,9 +194,63 @@ export const HabitDetailFeature = () => {
         </Text>
       </Card>
 
-      <Card padding="lg" className="shadow-lg shadow-black/10 elevation-5">
-        <Text className="text-base text-text mb-2 opacity-80">Created: {new Date(habit.createdAt).toLocaleDateString()}</Text>
-      </Card>
+      <View className="flex-row flex-wrap justify-between">
+        <View className="w-[48%] mb-4">
+          <Card padding="md" className="shadow-sm shadow-black/5 elevation-1 h-[100px] justify-between">
+            <View className="flex-row justify-between items-center">
+              <Text className="text-text text-xs font-semibold uppercase tracking-wider" style={{ opacity: 0.5 }}>
+                Frequency
+              </Text>
+              <Ionicons name="repeat-outline" size={18} color={colors.primary} />
+            </View>
+            <Text className="text-text font-bold text-base capitalize">
+              {habit.frequency}
+            </Text>
+          </Card>
+        </View>
+
+        <View className="w-[48%] mb-4">
+          <Card padding="md" className="shadow-sm shadow-black/5 elevation-1 h-[100px] justify-between">
+            <View className="flex-row justify-between items-center">
+              <Text className="text-text text-xs font-semibold uppercase tracking-wider" style={{ opacity: 0.5 }}>
+                Created
+              </Text>
+              <Ionicons name="calendar-outline" size={18} color={colors.primary} />
+            </View>
+            <Text className="text-text font-bold text-base">
+              {new Date(habit.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+            </Text>
+          </Card>
+        </View>
+
+        <View className="w-[48%] mb-4">
+          <Card padding="md" className="shadow-sm shadow-black/5 elevation-1 h-[100px] justify-between">
+            <View className="flex-row justify-between items-center">
+              <Text className="text-text text-xs font-semibold uppercase tracking-wider" style={{ opacity: 0.5 }}>
+                Last Done
+              </Text>
+              <Ionicons name="checkmark-done" size={18} color={colors.primary} />
+            </View>
+            <Text className="text-text font-bold text-base">
+              {habit.lastCompletedDate ? habit.lastCompletedDate.split('-').slice(1).join('/') : 'Never'}
+            </Text>
+          </Card>
+        </View>
+
+        <View className="w-[48%] mb-4">
+          <Card padding="md" className="shadow-sm shadow-black/5 elevation-1 h-[100px] justify-between">
+            <View className="flex-row justify-between items-center">
+              <Text className="text-text text-xs font-semibold uppercase tracking-wider" style={{ opacity: 0.5 }}>
+                Status
+              </Text>
+              <Ionicons name="ribbon-outline" size={18} color={colors.primary} />
+            </View>
+            <Text className="text-text font-bold text-base">
+              {habit.streak === 0 ? 'Starting' : habit.streak <= 5 ? 'Active' : 'Elite'}
+            </Text>
+          </Card>
+        </View>
+      </View>
 
       <DeleteConfirmationModal
         visible={isDeleteModalVisible}
