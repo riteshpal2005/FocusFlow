@@ -139,8 +139,62 @@ export const HabitDetailFeature = () => {
         </View>
       )}
 
+      <Card padding="md" className="mb-6 shadow-sm shadow-black/5 elevation-1">
+        <Text className="font-semibold text-text text-xs uppercase tracking-wider mb-3" style={{ opacity: 0.5 }}>
+          Recurrence Schedule
+        </Text>
+        
+        {habit.frequency === 'daily' || habit.frequency === 'weekly' ? (
+          <View className="flex-row justify-between mb-4">
+            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((label, index) => {
+              const isActive = habit.frequency === 'daily' || habit.daysOfWeek?.includes(index);
+              return (
+                <View
+                  key={index}
+                  className={`w-9 h-9 justify-center items-center rounded-full border ${
+                    isActive
+                      ? 'bg-primary border-primary'
+                      : 'border-border bg-background'
+                  }`}
+                  style={isActive ? undefined : { opacity: 0.3 }}
+                >
+                  <Text
+                    className={`text-sm font-semibold ${
+                      isActive ? 'text-white font-bold' : 'text-text'
+                    }`}
+                  >
+                    {label}
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
+        ) : habit.frequency === 'monthly' ? (
+          <View className="flex-row flex-wrap mb-4">
+            {habit.daysOfMonth?.map((day) => (
+              <View
+                key={day}
+                className="w-9 h-9 justify-center items-center rounded-full bg-primary border border-primary mr-2 mb-2"
+              >
+                <Text className="text-white text-sm font-bold">{day}</Text>
+              </View>
+            ))}
+          </View>
+        ) : (
+          <View className="flex-row items-center bg-background border border-border rounded-xl p-3 mb-4">
+            <Ionicons name="repeat-outline" size={20} color={colors.primary} style={{ marginRight: 8 }} />
+            <Text className="text-text font-semibold text-sm">
+              Repeats every {habit.customInterval} days
+            </Text>
+          </View>
+        )}
+
+        <Text className="text-text text-sm font-medium" style={{ opacity: 0.8 }}>
+          {scheduleString}
+        </Text>
+      </Card>
+
       <Card padding="lg" className="shadow-lg shadow-black/10 elevation-5">
-        <Text className="text-base text-text mb-2 opacity-80">Schedule: {scheduleString}</Text>
         <Text className="text-base text-text mb-2 opacity-80">Created: {new Date(habit.createdAt).toLocaleDateString()}</Text>
       </Card>
 
