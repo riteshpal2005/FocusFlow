@@ -1,52 +1,72 @@
 import React from 'react';
-import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { withLayoutContext } from 'expo-router';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../core/theme/useThemeStore';
+
+const { Navigator } = createMaterialTopTabNavigator();
+const MaterialTabs = withLayoutContext(Navigator);
 
 export default function TabsLayout() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
-    <Tabs
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: 'gray',
+    <MaterialTabs
+      tabBarPosition="bottom"
+      screenOptions={{
+        swipeEnabled: true,
         tabBarStyle: {
           backgroundColor: colors.surface,
+          borderTopWidth: 1,
           borderTopColor: colors.border || '#333',
+          height: 60 + insets.bottom,
+          paddingBottom: insets.bottom,
         },
-        tabBarIcon: ({ color, size }) => {
-          let iconName = 'home-outline';
-          if (route.name === 'home') {
-            iconName = 'home-outline';
-          } else if (route.name === 'checklist') {
-            iconName = 'checkbox-outline';
-          } else if (route.name === 'profile') {
-            iconName = 'person-outline';
-          }
-          return <Ionicons name={iconName as any} size={size} color={color} />;
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: 'gray',
+        tabBarIndicatorStyle: {
+          backgroundColor: colors.primary,
+          height: 3,
+          position: 'absolute',
+          top: 0,
         },
-      })}
+        tabBarShowIcon: true,
+        tabBarLabelStyle: {
+          fontSize: 10,
+          fontWeight: 'bold',
+          textTransform: 'none',
+        },
+      }}
     >
-      <Tabs.Screen
+      <MaterialTabs.Screen
         name="home"
         options={{
           title: 'Habits',
+          tabBarIcon: ({ color }: { color: string }) => (
+            <Ionicons name="home-outline" size={24} color={color} />
+          ),
         }}
       />
-      <Tabs.Screen
+      <MaterialTabs.Screen
         name="checklist"
         options={{
           title: 'Checklist',
+          tabBarIcon: ({ color }: { color: string }) => (
+            <Ionicons name="checkbox-outline" size={24} color={color} />
+          ),
         }}
       />
-      <Tabs.Screen
+      <MaterialTabs.Screen
         name="profile"
         options={{
           title: 'Profile',
+          tabBarIcon: ({ color }: { color: string }) => (
+            <Ionicons name="person-outline" size={24} color={color} />
+          ),
         }}
       />
-    </Tabs>
+    </MaterialTabs>
   );
 }
