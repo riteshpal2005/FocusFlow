@@ -22,7 +22,6 @@
     "expo-router": "~6.0.24",
     "expo-splash-screen": "~31.0.13",
     "expo-status-bar": "~3.0.9",
-    "firebase": "^12.15.0",
     "jotai": "^2.20.0",
     "nativewind": "^4.2.1",
     "react": "19.1.0",
