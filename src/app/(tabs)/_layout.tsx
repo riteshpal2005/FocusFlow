@@ -19,24 +19,20 @@ export default function TabsLayout() {
         swipeEnabled: true,
         tabBarStyle: {
           backgroundColor: colors.surface,
-          borderTopWidth: 1,
-          borderTopColor: colors.border || '#333',
+          borderTopWidth: 0,
           height: 60 + insets.bottom,
           paddingBottom: insets.bottom,
         },
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: 'gray',
+        tabBarInactiveTintColor: colors.secondary || 'gray',
         tabBarIndicatorStyle: {
           backgroundColor: colors.primary,
           height: 3,
-          position: 'absolute',
-          top: 0,
         },
         tabBarShowIcon: true,
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: 'bold',
-          textTransform: 'none',
         },
       }}
     >
