@@ -48,7 +48,7 @@ export const HabitCard: React.FC<HabitCardProps> = memo(({ habit, onToggle, onPr
 
   return (
     <Animated.View
-      entering={FadeInRight}
+      entering={FadeInRight.springify().damping(15).stiffness(100)}
       exiting={FadeOutLeft}
       layout={LinearTransition.springify()}
     >
@@ -62,7 +62,7 @@ export const HabitCard: React.FC<HabitCardProps> = memo(({ habit, onToggle, onPr
               {habit.name}
             </Text>
             <Text className="text-sm font-medium text-primary">
-              {habit.streak > 0 ? `🔥 ${habit.streak} Day Streak • ` : ''}
+              {habit.streak > 0 ? `${habit.streak} Day Streak • ` : ''}
               <Text className="text-text text-xs" style={{ opacity: 0.5 }}>
                 {recurrenceText}
               </Text>

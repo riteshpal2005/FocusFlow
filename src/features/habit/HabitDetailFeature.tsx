@@ -9,6 +9,8 @@ import { DeleteConfirmationModal } from '../../shared/components/DeleteConfirmat
 import { isHabitScheduled } from '../../shared/utils/recurrenceHelpers';
 import Animated, { 
   FadeIn, 
+  FadeInUp,
+  FadeInDown,
   useSharedValue, 
   useAnimatedStyle, 
   withSpring, 
@@ -136,7 +138,7 @@ export const HabitDetailFeature = () => {
 
   return (
     <View className="flex-1 pt-[62px] px-4 bg-background">
-      <View className="flex-row justify-between items-center mb-6">
+      <Animated.View entering={FadeInDown.duration(400).springify()} className="flex-row justify-between items-center mb-6">
         <TouchableOpacity onPress={() => router.back()} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
@@ -144,9 +146,9 @@ export const HabitDetailFeature = () => {
         <TouchableOpacity onPress={() => setIsDeleteModalVisible(true)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Ionicons name="trash-outline" size={24} color="#EF4444" />
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
-      <View className="rounded-2xl p-6 mb-6" style={{ backgroundColor: colors.primary }}>
+      <Animated.View entering={FadeInUp.delay(100).springify().damping(15)} className="rounded-2xl p-6 mb-6" style={{ backgroundColor: colors.primary }}>
         <Text className="text-white text-xs font-semibold uppercase tracking-wider mb-1" style={{ opacity: 0.7 }}>
           Habit
         </Text>
@@ -159,110 +161,114 @@ export const HabitDetailFeature = () => {
             day streak
           </Text>
         </View>
-      </View>
+      </Animated.View>
 
-      {isScheduledToday ? (
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={() => toggleHabit(habit.id)}
-        >
-          <Animated.View
-            className="flex-row items-center p-4 rounded-xl mb-6 border"
-            style={animatedBannerStyle}
+      <Animated.View entering={FadeInUp.delay(200).springify().damping(15)}>
+        {isScheduledToday ? (
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => toggleHabit(habit.id)}
           >
-            <Animated.View style={[{ marginRight: 12 }, iconStyle]}>
-              <Ionicons
-                name={habit.completedToday ? 'checkmark-circle' : 'ellipse-outline'}
-                size={24}
-                color={habit.completedToday ? '#22C55E' : colors.primary}
-              />
+            <Animated.View
+              className="flex-row items-center p-4 rounded-xl mb-6 border"
+              style={animatedBannerStyle}
+            >
+              <Animated.View style={[{ marginRight: 12 }, iconStyle]}>
+                <Ionicons
+                  name={habit.completedToday ? 'checkmark-circle' : 'ellipse-outline'}
+                  size={24}
+                  color={habit.completedToday ? '#22C55E' : colors.primary}
+                />
+              </Animated.View>
+              <View className="flex-1">
+                <Animated.Text
+                  className="font-semibold text-base"
+                  style={animatedTextColorStyle}
+                >
+                  {habit.completedToday ? 'Completed for Today!' : 'Mark Completed Today'}
+                </Animated.Text>
+                <Text className="text-text text-xs opacity-60 mt-0.5">
+                  {habit.completedToday ? 'Great job! Tap to undo completion.' : 'Tap to mark this routine as done.'}
+                </Text>
+              </View>
             </Animated.View>
+          </TouchableOpacity>
+        ) : (
+          <View className="flex-row items-center p-4 rounded-xl mb-6 border border-zinc-500/20 bg-zinc-500/10">
+            <View style={{ marginRight: 12 }}>
+              <Ionicons name="calendar-outline" size={24} color="gray" style={{ opacity: 0.7 }} />
+            </View>
             <View className="flex-1">
-              <Animated.Text
-                className="font-semibold text-base"
-                style={animatedTextColorStyle}
-              >
-                {habit.completedToday ? 'Completed for Today!' : 'Mark Completed Today'}
-              </Animated.Text>
-              <Text className="text-text text-xs opacity-60 mt-0.5">
-                {habit.completedToday ? 'Great job! Tap to undo completion.' : 'Tap to mark this routine as done.'}
+              <Text className="font-semibold text-base text-text opacity-70">
+                Off-Day Today
+              </Text>
+              <Text className="text-text text-xs opacity-50 mt-0.5">
+                Enjoy your off day! Not scheduled for today.
               </Text>
             </View>
-          </Animated.View>
-        </TouchableOpacity>
-      ) : (
-        <View className="flex-row items-center p-4 rounded-xl mb-6 border border-zinc-500/20 bg-zinc-500/10">
-          <View style={{ marginRight: 12 }}>
-            <Ionicons name="calendar-outline" size={24} color="gray" style={{ opacity: 0.7 }} />
-          </View>
-          <View className="flex-1">
-            <Text className="font-semibold text-base text-text opacity-70">
-              Off-Day Today
-            </Text>
-            <Text className="text-text text-xs opacity-50 mt-0.5">
-              Enjoy your off day! Not scheduled for today.
-            </Text>
-          </View>
-        </View>
-      )}
-
-      <Card padding="md" className="mb-6 shadow-sm shadow-black/5 elevation-1">
-        <Text className="font-semibold text-text text-xs uppercase tracking-wider mb-3" style={{ opacity: 0.5 }}>
-          Recurrence Schedule
-        </Text>
-        
-        {habit.frequency === 'daily' || habit.frequency === 'weekly' ? (
-          <View className="flex-row justify-between mb-4">
-            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((label, index) => {
-              const isActive = habit.frequency === 'daily' || habit.daysOfWeek?.includes(index);
-              return (
-                <View
-                  key={index}
-                  className={`w-9 h-9 justify-center items-center rounded-full border ${
-                    isActive
-                      ? 'bg-primary border-primary'
-                      : 'border-border bg-background'
-                  }`}
-                  style={isActive ? undefined : { opacity: 0.3 }}
-                >
-                  <Text
-                    className={`text-sm font-semibold ${
-                      isActive ? 'text-white font-bold' : 'text-text'
-                    }`}
-                  >
-                    {label}
-                  </Text>
-                </View>
-              );
-            })}
-          </View>
-        ) : habit.frequency === 'monthly' ? (
-          <View className="flex-row flex-wrap mb-4">
-            {habit.daysOfMonth?.map((day) => (
-              <View
-                key={day}
-                className="w-9 h-9 justify-center items-center rounded-full bg-primary border border-primary mr-2 mb-2"
-              >
-                <Text className="text-white text-sm font-bold">{day}</Text>
-              </View>
-            ))}
-          </View>
-        ) : (
-          <View className="flex-row items-center bg-background border border-border rounded-xl p-3 mb-4">
-            <Ionicons name="repeat-outline" size={20} color={colors.primary} style={{ marginRight: 8 }} />
-            <Text className="text-text font-semibold text-sm">
-              Repeats every {habit.customInterval} days
-            </Text>
           </View>
         )}
+      </Animated.View>
 
-        <Text className="text-text text-sm font-medium" style={{ opacity: 0.8 }}>
-          {scheduleString}
-        </Text>
-      </Card>
+      <Animated.View entering={FadeInUp.delay(300).springify().damping(15)}>
+        <Card padding="md" className="mb-6 shadow-sm shadow-black/5 elevation-1">
+          <Text className="font-semibold text-text text-xs uppercase tracking-wider mb-3" style={{ opacity: 0.5 }}>
+            Recurrence Schedule
+          </Text>
+          
+          {habit.frequency === 'daily' || habit.frequency === 'weekly' ? (
+            <View className="flex-row justify-between mb-4">
+              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((label, index) => {
+                const isActive = habit.frequency === 'daily' || habit.daysOfWeek?.includes(index);
+                return (
+                  <View
+                    key={index}
+                    className={`w-9 h-9 justify-center items-center rounded-full border ${
+                      isActive
+                        ? 'bg-primary border-primary'
+                        : 'border-border bg-background'
+                    }`}
+                    style={isActive ? undefined : { opacity: 0.3 }}
+                  >
+                    <Text
+                      className={`text-sm font-semibold ${
+                        isActive ? 'text-white font-bold' : 'text-text'
+                      }`}
+                    >
+                      {label}
+                    </Text>
+                  </View>
+                );
+              })}
+            </View>
+          ) : habit.frequency === 'monthly' ? (
+            <View className="flex-row flex-wrap mb-4">
+              {habit.daysOfMonth?.map((day) => (
+                <View
+                  key={day}
+                  className="w-9 h-9 justify-center items-center rounded-full bg-primary border border-primary mr-2 mb-2"
+                >
+                  <Text className="text-white text-sm font-bold">{day}</Text>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <View className="flex-row items-center bg-background border border-border rounded-xl p-3 mb-4">
+              <Ionicons name="repeat-outline" size={20} color={colors.primary} style={{ marginRight: 8 }} />
+              <Text className="text-text font-semibold text-sm">
+                Repeats every {habit.customInterval} days
+              </Text>
+            </View>
+          )}
+
+          <Text className="text-text text-sm font-medium" style={{ opacity: 0.8 }}>
+            {scheduleString}
+          </Text>
+        </Card>
+      </Animated.View>
 
       <View className="flex-row flex-wrap justify-between">
-        <View className="w-[48%] mb-4">
+        <Animated.View className="w-[48%] mb-4" entering={FadeInUp.delay(400).springify().damping(15)}>
           <Card padding="md" className="shadow-sm shadow-black/5 elevation-1 h-[100px] justify-between">
             <View className="flex-row justify-between items-center">
               <Text className="text-text text-xs font-semibold uppercase tracking-wider" style={{ opacity: 0.5 }}>
@@ -274,9 +280,9 @@ export const HabitDetailFeature = () => {
               {habit.frequency}
             </Text>
           </Card>
-        </View>
+        </Animated.View>
 
-        <View className="w-[48%] mb-4">
+        <Animated.View className="w-[48%] mb-4" entering={FadeInUp.delay(450).springify().damping(15)}>
           <Card padding="md" className="shadow-sm shadow-black/5 elevation-1 h-[100px] justify-between">
             <View className="flex-row justify-between items-center">
               <Text className="text-text text-xs font-semibold uppercase tracking-wider" style={{ opacity: 0.5 }}>
@@ -288,9 +294,9 @@ export const HabitDetailFeature = () => {
               {new Date(habit.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
             </Text>
           </Card>
-        </View>
+        </Animated.View>
 
-        <View className="w-[48%] mb-4">
+        <Animated.View className="w-[48%] mb-4" entering={FadeInUp.delay(500).springify().damping(15)}>
           <Card padding="md" className="shadow-sm shadow-black/5 elevation-1 h-[100px] justify-between">
             <View className="flex-row justify-between items-center">
               <Text className="text-text text-xs font-semibold uppercase tracking-wider" style={{ opacity: 0.5 }}>
@@ -306,9 +312,9 @@ export const HabitDetailFeature = () => {
               {habit.lastCompletedDate ? habit.lastCompletedDate.split('-').slice(1).join('/') : 'Never'}
             </Animated.Text>
           </Card>
-        </View>
+        </Animated.View>
 
-        <View className="w-[48%] mb-4">
+        <Animated.View className="w-[48%] mb-4" entering={FadeInUp.delay(550).springify().damping(15)}>
           <Card padding="md" className="shadow-sm shadow-black/5 elevation-1 h-[100px] justify-between">
             <View className="flex-row justify-between items-center">
               <Text className="text-text text-xs font-semibold uppercase tracking-wider" style={{ opacity: 0.5 }}>
@@ -324,7 +330,7 @@ export const HabitDetailFeature = () => {
               {habit.streak === 0 ? 'Starting' : habit.streak <= 5 ? 'Active' : 'Elite'}
             </Animated.Text>
           </Card>
-        </View>
+        </Animated.View>
       </View>
 
       <DeleteConfirmationModal
