@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TextInput, TouchableOpacity, Text, View, ScrollView } from 'react-native';
 import { RecurrenceFrequency } from '../../shared/utils/storageHelpers';
+import { useTheme } from '../../core/theme/useThemeStore';
 
 interface HabitInputSectionProps {
   onSubmit: (
@@ -23,6 +24,7 @@ const DAYS_OF_WEEK = [
 ];
 
 export const HabitInputSection: React.FC<HabitInputSectionProps> = ({ onSubmit }) => {
+  const { colors } = useTheme();
   const [name, setName] = useState('');
   const [frequency, setFrequency] = useState<RecurrenceFrequency>('daily');
   const [daysOfWeek, setDaysOfWeek] = useState<number[]>([]);
@@ -74,30 +76,40 @@ export const HabitInputSection: React.FC<HabitInputSectionProps> = ({ onSubmit }
         onChangeText={setName}
       />
 
-      <Text className="text-text font-semibold mb-2 text-sm opacity-80">Frequency</Text>
+      <Text className="text-text font-semibold mb-2 text-sm" style={{ opacity: 0.8 }}>Frequency</Text>
       <View className="flex-row bg-background p-1 rounded-lg mb-4">
-        {(['daily', 'weekly', 'monthly', 'custom'] as const).map((freq) => (
-          <TouchableOpacity
-            key={freq}
-            onPress={() => setFrequency(freq)}
-            className={`flex-grow flex-shrink py-2 items-center rounded-md ${
-              frequency === freq ? 'bg-surface shadow shadow-black/10' : ''
-            }`}
-          >
-            <Text
-              className={`text-xs font-semibold capitalize ${
-                frequency === freq ? 'text-primary font-bold' : 'text-text opacity-60'
-              }`}
+        {(['daily', 'weekly', 'monthly', 'custom'] as const).map((freq) => {
+          const isSelected = frequency === freq;
+          return (
+            <TouchableOpacity
+              key={freq}
+              onPress={() => setFrequency(freq)}
+              className="flex-grow flex-shrink py-2 items-center rounded-md"
+              style={isSelected ? {
+                backgroundColor: colors.surface,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.1,
+                shadowRadius: 2,
+                elevation: 1,
+              } : undefined}
             >
-              {freq}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <Text
+                className={`text-xs font-semibold capitalize ${
+                  isSelected ? 'text-primary font-bold' : 'text-text'
+                }`}
+                style={isSelected ? undefined : { opacity: 0.6 }}
+              >
+                {freq}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
 
       {frequency === 'weekly' && (
         <View className="mb-4">
-          <Text className="text-text font-semibold mb-2 text-sm opacity-80">Repeat on</Text>
+          <Text className="text-text font-semibold mb-2 text-sm" style={{ opacity: 0.8 }}>Repeat on</Text>
           <View className="flex-row justify-between">
             {DAYS_OF_WEEK.map((day) => {
               const isSelected = daysOfWeek.includes(day.value);
@@ -113,8 +125,9 @@ export const HabitInputSection: React.FC<HabitInputSectionProps> = ({ onSubmit }
                 >
                   <Text
                     className={`text-sm font-semibold ${
-                      isSelected ? 'text-white font-bold' : 'text-text opacity-70'
+                      isSelected ? 'text-white font-bold' : 'text-text'
                     }`}
+                    style={isSelected ? undefined : { opacity: 0.7 }}
                   >
                     {day.label}
                   </Text>
@@ -127,7 +140,7 @@ export const HabitInputSection: React.FC<HabitInputSectionProps> = ({ onSubmit }
 
       {frequency === 'monthly' && (
         <View className="mb-4">
-          <Text className="text-text font-semibold mb-2 text-sm opacity-80">Repeat on day of month</Text>
+          <Text className="text-text font-semibold mb-2 text-sm" style={{ opacity: 0.8 }}>Repeat on day of month</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row py-1">
             {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => {
               const isSelected = daysOfMonth.includes(day);
@@ -143,8 +156,9 @@ export const HabitInputSection: React.FC<HabitInputSectionProps> = ({ onSubmit }
                 >
                   <Text
                     className={`text-sm font-semibold ${
-                      isSelected ? 'text-white font-bold' : 'text-text opacity-70'
+                      isSelected ? 'text-white font-bold' : 'text-text'
                     }`}
+                    style={isSelected ? undefined : { opacity: 0.7 }}
                   >
                     {day}
                   </Text>
@@ -157,14 +171,14 @@ export const HabitInputSection: React.FC<HabitInputSectionProps> = ({ onSubmit }
 
       {frequency === 'custom' && (
         <View className="flex-row items-center mb-4 bg-surface border border-border rounded-lg px-4 h-[50px]">
-          <Text className="text-text opacity-70 mr-2 text-base">Repeat every</Text>
+          <Text className="text-text mr-2 text-base" style={{ opacity: 0.7 }}>Repeat every</Text>
           <TextInput
             className="flex-1 text-text font-bold text-center text-base"
             keyboardType="number-pad"
             value={customInterval}
             onChangeText={(val) => setCustomInterval(val.replace(/[^0-9]/g, ''))}
           />
-          <Text className="text-text opacity-70 ml-2 text-base">days</Text>
+          <Text className="text-text ml-2 text-base" style={{ opacity: 0.7 }}>days</Text>
         </View>
       )}
 

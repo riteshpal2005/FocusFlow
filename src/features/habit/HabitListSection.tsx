@@ -36,15 +36,15 @@ export const HabitListSection: React.FC<HabitListSectionProps> = ({ habits, onTo
         <View className="items-center px-8">
           {habits.length === 0 ? (
             <>
-              <Ionicons name="calendar-outline" size={64} color="gray" className="opacity-40 mb-4" />
-              <Text className="text-center opacity-50 text-text text-lg font-semibold mb-2">No habits yet</Text>
-              <Text className="text-center opacity-40 text-text text-sm">Start building positive routines by adding your first habit.</Text>
+              <Ionicons name="calendar-outline" size={64} color="gray" style={{ opacity: 0.4 }} className="mb-4" />
+              <Text className="text-center text-text text-lg font-semibold mb-2" style={{ opacity: 0.5 }}>No habits yet</Text>
+              <Text className="text-center text-text text-sm" style={{ opacity: 0.4 }}>Start building positive routines by adding your first habit.</Text>
             </>
           ) : (
             <>
-              <Ionicons name="sparkles-outline" size={64} color="gray" className="opacity-40 mb-4" />
-              <Text className="text-center opacity-50 text-text text-lg font-semibold mb-2">No habits scheduled today</Text>
-              <Text className="text-center opacity-40 text-text text-sm">Enjoy your off day! You can see your full list of habits in the section below.</Text>
+              <Ionicons name="sparkles-outline" size={64} color="gray" style={{ opacity: 0.4 }} className="mb-4" />
+              <Text className="text-center text-text text-lg font-semibold mb-2" style={{ opacity: 0.5 }}>No habits scheduled today</Text>
+              <Text className="text-center text-text text-sm" style={{ opacity: 0.4 }}>Enjoy your off day! You can see your full list of habits in the section below.</Text>
             </>
           )}
         </View>
@@ -57,7 +57,7 @@ export const HabitListSection: React.FC<HabitListSectionProps> = ({ habits, onTo
               onPress={() => setIsExpanded(!isExpanded)}
               className="flex-row items-center justify-between py-3 border-t border-border"
             >
-              <Text className="font-semibold text-text opacity-60 text-base">
+              <Text className="font-semibold text-text text-base" style={{ opacity: 0.6 }}>
                 Off-Day Habits ({offDayHabits.length})
               </Text>
               <Ionicons
@@ -70,7 +70,7 @@ export const HabitListSection: React.FC<HabitListSectionProps> = ({ habits, onTo
             {isExpanded && (
               <View className="mt-2">
                 {offDayHabits.map((item) => (
-                  <View key={item.id} className="opacity-60">
+                  <View key={item.id} style={{ opacity: 0.6 }}>
                     <HabitCard habit={item} onToggle={onToggle} onPress={onPress} />
                   </View>
                 ))}
