@@ -19,13 +19,20 @@ function AppLayoutContent() {
   const pathname = usePathname();
   const { setColorScheme } = useColorScheme();
   const [hasMounted, setHasMounted] = useState(false);
+  const [isThemeLoaded, setIsThemeLoaded] = useState(false);
 
   useEffect(() => {
     setHasMounted(true);
   }, []);
 
   useEffect(() => {
-    initializeTheme();
+    initializeTheme()
+      .then(() => {
+        setIsThemeLoaded(true);
+      })
+      .catch(() => {
+        setIsThemeLoaded(true);
+      });
     const unsubscribe = initializeAuth();
     return () => {
       if (typeof unsubscribe === 'function') {
@@ -39,7 +46,7 @@ function AppLayoutContent() {
   }, [theme, setColorScheme]);
 
   useEffect(() => {
-    if (!hasMounted || isLoading) return;
+    if (!hasMounted || isLoading || !isThemeLoaded) return;
 
     if (!user && pathname !== '/auth/login') {
       router.replace('/auth/login');
@@ -49,17 +56,17 @@ function AppLayoutContent() {
     if (user && (pathname === '/' || pathname.startsWith('/auth') || pathname === '/auth/login')) {
       router.replace('/home');
     }
-  }, [hasMounted, isLoading, user, pathname, router]);
+  }, [hasMounted, isLoading, isThemeLoaded, user, pathname, router]);
 
   useEffect(() => {
-    if (!isLoading) {
+    if (isThemeLoaded && !isLoading) {
       SplashScreen.hideAsync().catch((error) => {
         console.warn("Failed to hide splash screen:", error);
       });
     }
-  }, [isLoading]);
+  }, [isThemeLoaded, isLoading]);
 
-  if (isLoading) {
+  if (!isThemeLoaded || isLoading) {
     return null;
   }
 
