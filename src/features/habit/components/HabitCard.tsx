@@ -28,6 +28,24 @@ export const HabitCard: React.FC<HabitCardProps> = memo(({ habit, onToggle, onPr
     transform: [{ scale: scale.value }]
   }));
 
+  const recurrenceText = React.useMemo(() => {
+    switch (habit.frequency) {
+      case 'daily':
+        return 'Daily';
+      case 'weekly':
+        if (!habit.daysOfWeek || habit.daysOfWeek.length === 0) return 'Weekly';
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        return habit.daysOfWeek.map((d) => dayNames[d]).join(', ');
+      case 'monthly':
+        if (!habit.daysOfMonth || habit.daysOfMonth.length === 0) return 'Monthly';
+        return `Monthly: ${habit.daysOfMonth.join(', ')}`;
+      case 'custom':
+        return `Every ${habit.customInterval || 1} days`;
+      default:
+        return 'Daily';
+    }
+  }, [habit]);
+
   return (
     <Animated.View
       entering={FadeInRight}
@@ -44,7 +62,10 @@ export const HabitCard: React.FC<HabitCardProps> = memo(({ habit, onToggle, onPr
               {habit.name}
             </Text>
             <Text className="text-sm font-medium text-primary">
-              🔥 {habit.streak} Day Streak
+              {habit.streak > 0 ? `🔥 ${habit.streak} Day Streak • ` : ''}
+              <Text className="text-text text-xs" style={{ opacity: 0.5 }}>
+                {recurrenceText}
+              </Text>
             </Text>
           </View>
           <TouchableOpacity
