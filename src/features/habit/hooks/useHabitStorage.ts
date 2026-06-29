@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getHabits, saveHabits, Habit } from '../../../shared/utils/storageHelpers';
+import { getHabits, saveHabits, Habit, RecurrenceFrequency } from '../../../shared/utils/storageHelpers';
 import { useAuth } from '../../../core/auth/useAuthStore';
 import { SyncService } from '../../../core/services/syncService';
 
@@ -25,7 +25,13 @@ export const useHabitStorage = () => {
     loadInitialData();
   }, [loadInitialData]);
 
-  const addHabit = async (name: string) => {
+  const addHabit = async (
+    name: string,
+    frequency: RecurrenceFrequency = 'daily',
+    daysOfWeek?: number[],
+    daysOfMonth?: number[],
+    customInterval?: number
+  ) => {
     const newHabit: Habit = {
       id: Date.now().toString(),
       name,
@@ -34,6 +40,10 @@ export const useHabitStorage = () => {
       createdAt: Date.now(),
       updatedAt: Date.now(),
       sync_status: user ? 'pending' : 'synced',
+      frequency,
+      daysOfWeek,
+      daysOfMonth,
+      customInterval,
     };
 
     const currentHabits = await getHabits();

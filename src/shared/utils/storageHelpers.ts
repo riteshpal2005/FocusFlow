@@ -65,6 +65,8 @@ interface User {
     username: string;
 }
 
+export type RecurrenceFrequency = 'daily' | 'weekly' | 'monthly' | 'custom';
+
 export interface Habit {
     id: string;
     name: string;
@@ -73,6 +75,12 @@ export interface Habit {
     createdAt: number;
     sync_status?: 'synced' | 'pending' | 'deleted';
     updatedAt: number;
+    frequency: RecurrenceFrequency;
+    daysOfWeek?: number[];
+    daysOfMonth?: number[];
+    customInterval?: number;
+    lastCompletedDate?: string;
+    lastResetDate?: string;
 }
 
 export interface ChecklistItem {
@@ -96,7 +104,23 @@ export const getHabits = async (): Promise<Habit[]> => {
     try {
         const habits = await kvStorage.getItem(STORAGE_KEYS.HABITS);
         if (habits) {
-            return JSON.parse(habits);
+            const parsed = JSON.parse(habits) as any[];
+            let needsSave = false;
+            const migrated = parsed.map((h) => {
+                if (!h.frequency) {
+                    needsSave = true;
+                    return {
+                        ...h,
+                        frequency: 'daily' as const,
+                        lastCompletedDate: h.completedToday ? new Date(h.updatedAt).toISOString().split('T')[0] : undefined,
+                    };
+                }
+                return h as Habit;
+            });
+            if (needsSave) {
+                await saveHabits(migrated);
+            }
+            return migrated;
         }
         return [];
     } catch (error) {
