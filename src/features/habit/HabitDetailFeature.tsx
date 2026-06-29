@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -7,6 +7,15 @@ import { useHabitStorage } from './hooks/useHabitStorage';
 import { Card } from '../../shared/components/ui/Card';
 import { DeleteConfirmationModal } from '../../shared/components/DeleteConfirmationModal';
 import { isHabitScheduled } from '../../shared/utils/recurrenceHelpers';
+import Animated, { 
+  FadeIn, 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withSpring, 
+  withTiming, 
+  withSequence, 
+  interpolateColor 
+} from 'react-native-reanimated';
 
 export const HabitDetailFeature = () => {
   const { colors } = useTheme();
@@ -24,6 +33,63 @@ export const HabitDetailFeature = () => {
     if (!habit) return false;
     return isHabitScheduled(habit, new Date());
   }, [habit]);
+
+  const streakScale = useSharedValue(1);
+  const progress = useSharedValue(0);
+  const iconScale = useSharedValue(1);
+
+  useEffect(() => {
+    if (habit) {
+      streakScale.value = withSequence(
+        withSpring(1.2, { damping: 10, stiffness: 100 }),
+        withSpring(1, { damping: 15, stiffness: 120 })
+      );
+    }
+  }, [habit?.streak, streakScale]);
+
+  useEffect(() => {
+    if (habit) {
+      progress.value = withTiming(habit.completedToday ? 1 : 0, { duration: 300 });
+      iconScale.value = withSequence(
+        withSpring(1.3, { damping: 10 }),
+        withSpring(1)
+      );
+    }
+  }, [habit?.completedToday, progress, iconScale]);
+
+  const streakStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: streakScale.value }]
+  }));
+
+  const animatedBannerStyle = useAnimatedStyle(() => {
+    const backgroundColor = interpolateColor(
+      progress.value,
+      [0, 1],
+      [`${colors.primary}12`, '#22C55E22']
+    );
+    const borderColor = interpolateColor(
+      progress.value,
+      [0, 1],
+      [`${colors.primary}4D`, '#22C55E66']
+    );
+    return {
+      backgroundColor,
+      borderColor
+    };
+  });
+
+  const animatedTextColorStyle = useAnimatedStyle(() => {
+    const color = interpolateColor(
+      progress.value,
+      [0, 1],
+      [colors.primary, '#22C55E']
+    );
+    return { color };
+  });
+
+  const iconStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: iconScale.value }]
+  }));
 
   const scheduleString = useMemo(() => {
     if (!habit) return '';
@@ -86,7 +152,9 @@ export const HabitDetailFeature = () => {
         </Text>
         <Text className="text-white text-3xl font-extrabold mb-4">{habit.name}</Text>
         <View className="flex-row items-baseline">
-          <Text className="text-white text-5xl font-black">{habit.streak}</Text>
+          <Animated.Text className="text-white text-5xl font-black" style={streakStyle}>
+            {habit.streak}
+          </Animated.Text>
           <Text className="text-white text-lg font-medium ml-2" style={{ opacity: 0.8 }}>
             day streak
           </Text>
@@ -97,31 +165,30 @@ export const HabitDetailFeature = () => {
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => toggleHabit(habit.id)}
-          className={`flex-row items-center p-4 rounded-xl mb-6 border ${
-            habit.completedToday
-              ? 'bg-green-500/10 border-green-500/30'
-              : 'bg-primary/10 border-primary/30'
-          }`}
         >
-          <View style={{ marginRight: 12 }}>
-            <Ionicons
-              name={habit.completedToday ? 'checkmark-circle' : 'ellipse-outline'}
-              size={24}
-              color={habit.completedToday ? '#22C55E' : colors.primary}
-            />
-          </View>
-          <View className="flex-1">
-            <Text
-              className={`font-semibold text-base ${
-                habit.completedToday ? 'text-green-600 dark:text-green-400' : 'text-primary'
-              }`}
-            >
-              {habit.completedToday ? 'Completed for Today!' : 'Mark Completed Today'}
-            </Text>
-            <Text className="text-text text-xs opacity-60 mt-0.5">
-              {habit.completedToday ? 'Great job! Tap to undo completion.' : 'Tap to mark this routine as done.'}
-            </Text>
-          </View>
+          <Animated.View
+            className="flex-row items-center p-4 rounded-xl mb-6 border"
+            style={animatedBannerStyle}
+          >
+            <Animated.View style={[{ marginRight: 12 }, iconStyle]}>
+              <Ionicons
+                name={habit.completedToday ? 'checkmark-circle' : 'ellipse-outline'}
+                size={24}
+                color={habit.completedToday ? '#22C55E' : colors.primary}
+              />
+            </Animated.View>
+            <View className="flex-1">
+              <Animated.Text
+                className="font-semibold text-base"
+                style={animatedTextColorStyle}
+              >
+                {habit.completedToday ? 'Completed for Today!' : 'Mark Completed Today'}
+              </Animated.Text>
+              <Text className="text-text text-xs opacity-60 mt-0.5">
+                {habit.completedToday ? 'Great job! Tap to undo completion.' : 'Tap to mark this routine as done.'}
+              </Text>
+            </View>
+          </Animated.View>
         </TouchableOpacity>
       ) : (
         <View className="flex-row items-center p-4 rounded-xl mb-6 border border-zinc-500/20 bg-zinc-500/10">
@@ -231,9 +298,13 @@ export const HabitDetailFeature = () => {
               </Text>
               <Ionicons name="checkmark-done" size={18} color={colors.primary} />
             </View>
-            <Text className="text-text font-bold text-base">
+            <Animated.Text
+              key={habit.lastCompletedDate || 'never'}
+              entering={FadeIn.duration(300)}
+              className="text-text font-bold text-base"
+            >
               {habit.lastCompletedDate ? habit.lastCompletedDate.split('-').slice(1).join('/') : 'Never'}
-            </Text>
+            </Animated.Text>
           </Card>
         </View>
 
@@ -245,9 +316,13 @@ export const HabitDetailFeature = () => {
               </Text>
               <Ionicons name="ribbon-outline" size={18} color={colors.primary} />
             </View>
-            <Text className="text-text font-bold text-base">
+            <Animated.Text
+              key={habit.streak}
+              entering={FadeIn.duration(300)}
+              className="text-text font-bold text-base"
+            >
               {habit.streak === 0 ? 'Starting' : habit.streak <= 5 ? 'Active' : 'Elite'}
-            </Text>
+            </Animated.Text>
           </Card>
         </View>
       </View>
