@@ -2,6 +2,7 @@
   "expo": {
     "name": "FocusFlow",
     "slug": "focus-flow-app",
+    "scheme": "focusflow",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
