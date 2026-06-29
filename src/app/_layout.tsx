@@ -49,8 +49,15 @@ function AppLayoutContent() {
     }
   }, [hasMounted, isLoading, user, pathname, router]);
 
-  if (isLoading) {
-    return <CustomSplashScreen />;
+  const [isSplashVisible, setIsSplashVisible] = useState(true);
+
+  if (isSplashVisible) {
+    return (
+      <CustomSplashScreen
+        isLoading={isLoading}
+        onAnimationComplete={() => setIsSplashVisible(false)}
+      />
+    );
   }
 
   return (
