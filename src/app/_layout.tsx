@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
@@ -16,6 +16,11 @@ function AppLayoutContent() {
   const router = useRouter();
   const pathname = usePathname();
   const { setColorScheme } = useColorScheme();
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   useEffect(() => {
     initializeTheme();
@@ -32,7 +37,7 @@ function AppLayoutContent() {
   }, [theme, setColorScheme]);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (!hasMounted || isLoading) return;
 
     if (!user && pathname !== '/auth/login') {
       router.replace('/auth/login');
@@ -42,7 +47,7 @@ function AppLayoutContent() {
     if (user && (pathname === '/' || pathname.startsWith('/auth') || pathname === '/auth/login')) {
       router.replace('/home');
     }
-  }, [isLoading, user, pathname, router]);
+  }, [hasMounted, isLoading, user, pathname, router]);
 
   if (isLoading) {
     return <CustomSplashScreen />;
