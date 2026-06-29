@@ -4,6 +4,7 @@ const STORAGE_KEYS = {
     THEME: '@focucsflow_theme',
     USER: '@focusflow_user',
     HABITS: '@focusflow_habits',
+    CHECKLIST: '@focusflow_checklist',
 } as const;
 
 export const saveTheme = async (theme: string): Promise<void> => {
@@ -37,6 +38,15 @@ export interface Habit {
     updatedAt: number;
 }
 
+export interface ChecklistItem {
+    id: string;
+    name: string;
+    isChecked: boolean;
+    createdAt: number;
+    updatedAt: number;
+    sync_status?: 'synced' | 'pending' | 'deleted';
+}
+
 export const saveHabits = async (habits: Habit[]): Promise<void> => {
     try {
         await AsyncStorage.setItem(STORAGE_KEYS.HABITS, JSON.stringify(habits));
@@ -54,6 +64,27 @@ export const getHabits = async (): Promise<Habit[]> => {
         return [];
     } catch (error) {
         console.error("Failed to fetch habits from disk:", error);
+        return [];
+    }
+};
+
+export const saveChecklistItems = async (items: ChecklistItem[]): Promise<void> => {
+    try {
+        await AsyncStorage.setItem(STORAGE_KEYS.CHECKLIST, JSON.stringify(items));
+    } catch (error) {
+        console.error("Failed to save checklist items to disk:", error);
+    }
+};
+
+export const getChecklistItems = async (): Promise<ChecklistItem[]> => {
+    try {
+        const items = await AsyncStorage.getItem(STORAGE_KEYS.CHECKLIST);
+        if (items) {
+            return JSON.parse(items);
+        }
+        return [];
+    } catch (error) {
+        console.error("Failed to fetch checklist items from disk:", error);
         return [];
     }
 };
