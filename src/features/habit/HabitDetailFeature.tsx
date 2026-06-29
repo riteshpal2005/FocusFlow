@@ -64,24 +64,33 @@ export const HabitDetailFeature = () => {
 
   return (
     <View className="flex-1 pt-[50px] px-4 bg-background">
-      <View className="flex-row justify-between items-center mb-[30px]">
+      <View className="flex-row justify-between items-center mb-6">
         <TouchableOpacity onPress={() => router.back()} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-          <Ionicons name="arrow-back" size={28} color={colors.text} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text className="text-xl font-bold text-text">Details</Text>
-        <View className="w-7" />
+        <Text className="text-lg font-bold text-text">Habit Details</Text>
+        <TouchableOpacity onPress={() => setIsDeleteModalVisible(true)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <Ionicons name="trash-outline" size={24} color="#EF4444" />
+        </TouchableOpacity>
+      </View>
+
+      <View className="rounded-2xl p-6 mb-6" style={{ backgroundColor: colors.primary }}>
+        <Text className="text-white text-xs font-semibold uppercase tracking-wider mb-1" style={{ opacity: 0.7 }}>
+          Habit
+        </Text>
+        <Text className="text-white text-3xl font-extrabold mb-4">{habit.name}</Text>
+        <View className="flex-row items-baseline">
+          <Text className="text-white text-5xl font-black">{habit.streak}</Text>
+          <Text className="text-white text-lg font-medium ml-2" style={{ opacity: 0.8 }}>
+            day streak
+          </Text>
+        </View>
       </View>
 
       <Card padding="lg" className="shadow-lg shadow-black/10 elevation-5">
-        <Text className="text-[28px] font-bold text-text mb-4">{habit.name}</Text>
-        <Text className="text-base text-text mb-2 opacity-80">Streak: {habit.streak} days</Text>
         <Text className="text-base text-text mb-2 opacity-80">Status today: {habit.completedToday ? '✅ Completed' : '❌ Pending'}</Text>
         <Text className="text-base text-text mb-2 opacity-80">Schedule: {scheduleString}</Text>
         <Text className="text-base text-text mb-2 opacity-80">Created: {new Date(habit.createdAt).toLocaleDateString()}</Text>
-
-        <TouchableOpacity onPress={() => setIsDeleteModalVisible(true)} className="mt-[30px] p-[15px] items-center">
-          <Text className="text-[#EF4444] font-bold text-base">Delete Habit</Text>
-        </TouchableOpacity>
       </Card>
 
       <DeleteConfirmationModal
