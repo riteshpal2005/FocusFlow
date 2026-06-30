@@ -19,6 +19,66 @@ import Animated, {
   interpolateColor 
 } from 'react-native-reanimated';
 
+interface RollingDigitProps {
+  digit: number;
+}
+
+const RollingDigit: React.FC<RollingDigitProps> = ({ digit }) => {
+  const translateY = useSharedValue(0);
+
+  useEffect(() => {
+    translateY.value = withSpring(-digit * 48, {
+      damping: 15,
+      stiffness: 120,
+    });
+  }, [digit]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
+
+  return (
+    <View style={{ height: 48, overflow: 'hidden', width: 28 }}>
+      <Animated.View style={animatedStyle}>
+        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+          <Text
+            key={num}
+            style={{
+              height: 48,
+              fontSize: 48,
+              lineHeight: 48,
+              fontWeight: '900',
+              color: 'white',
+              textAlign: 'center',
+            }}
+          >
+            {num}
+          </Text>
+        ))}
+      </Animated.View>
+    </View>
+  );
+};
+
+interface RollingNumberProps {
+  value: number;
+}
+
+const RollingNumber: React.FC<RollingNumberProps> = ({ value }) => {
+  const digits = useMemo(() => {
+    const str = Math.abs(value).toString();
+    return str.split('').map(Number);
+  }, [value]);
+
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', height: 48 }}>
+      {digits.map((digit, index) => (
+        <RollingDigit key={`${index}-${digit}`} digit={digit} />
+      ))}
+    </View>
+  );
+};
+
 export const HabitDetailFeature = () => {
   const { colors } = useTheme();
   const router = useRouter();
@@ -67,16 +127,11 @@ export const HabitDetailFeature = () => {
     const backgroundColor = interpolateColor(
       progress.value,
       [0, 1],
-      [`${colors.primary}12`, '#22C55E22']
-    );
-    const borderColor = interpolateColor(
-      progress.value,
-      [0, 1],
-      [`${colors.primary}4D`, '#22C55E66']
+      [colors.primary, '#22C55E']
     );
     return {
       backgroundColor,
-      borderColor
+      borderColor: backgroundColor
     };
   });
 
@@ -154,9 +209,7 @@ export const HabitDetailFeature = () => {
         </Text>
         <Text className="text-white text-3xl font-extrabold mb-4">{habit.name}</Text>
         <View className="flex-row items-baseline">
-          <Animated.Text className="text-white text-5xl font-black" style={streakStyle}>
-            {habit.streak}
-          </Animated.Text>
+          <RollingNumber value={habit.streak} />
           <Text className="text-white text-lg font-medium ml-2" style={{ opacity: 0.8 }}>
             day streak
           </Text>
@@ -176,17 +229,14 @@ export const HabitDetailFeature = () => {
               <Ionicons
                 name={habit.completedToday ? 'checkmark-circle' : 'ellipse-outline'}
                 size={24}
-                color={habit.completedToday ? '#22C55E' : colors.primary}
+                color="white"
               />
             </Animated.View>
             <View className="flex-1">
-              <Animated.Text
-                className="font-semibold text-base"
-                style={animatedTextColorStyle}
-              >
+              <Text className="font-semibold text-base text-white">
                 {habit.completedToday ? 'Completed for Today!' : 'Mark Completed Today'}
-              </Animated.Text>
-              <Text className="text-text text-xs opacity-60 mt-0.5">
+              </Text>
+              <Text className="text-white text-xs mt-0.5" style={{ opacity: 0.8 }}>
                 {habit.completedToday ? 'Great job! Tap to undo completion.' : 'Tap to mark this routine as done.'}
               </Text>
             </View>
@@ -302,7 +352,7 @@ export const HabitDetailFeature = () => {
             </View>
             <Animated.Text
               key={habit.lastCompletedDate || 'never'}
-              entering={FadeIn.duration(300)}
+              entering={FadeInDown.duration(350).springify().damping(12)}
               className="text-text font-bold text-base"
             >
               {habit.lastCompletedDate ? habit.lastCompletedDate.split('-').slice(1).join('/') : 'Never'}
@@ -320,7 +370,7 @@ export const HabitDetailFeature = () => {
             </View>
             <Animated.Text
               key={habit.streak}
-              entering={FadeIn.duration(300)}
+              entering={FadeInDown.duration(350).springify().damping(12)}
               className="text-text font-bold text-base"
             >
               {habit.streak === 0 ? 'Starting' : habit.streak <= 5 ? 'Active' : 'Elite'}
