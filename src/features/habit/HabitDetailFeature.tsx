@@ -11,12 +11,15 @@ import Animated, {
   FadeIn, 
   FadeInUp,
   FadeInDown,
+  FadeInLeft,
+  FadeInRight,
   useSharedValue, 
   useAnimatedStyle, 
   withSpring, 
   withTiming, 
   withSequence, 
-  interpolateColor 
+  interpolateColor,
+  Easing
 } from 'react-native-reanimated';
 
 interface RollingDigitProps {
@@ -27,9 +30,9 @@ const RollingDigit: React.FC<RollingDigitProps> = ({ digit }) => {
   const translateY = useSharedValue(0);
 
   useEffect(() => {
-    translateY.value = withSpring(-digit * 48, {
-      damping: 15,
-      stiffness: 120,
+    translateY.value = withTiming(-digit * 48, {
+      duration: 350,
+      easing: Easing.out(Easing.quad),
     });
   }, [digit]);
 
@@ -352,7 +355,7 @@ export const HabitDetailFeature = () => {
             </View>
             <Animated.Text
               key={habit.lastCompletedDate || 'never'}
-              entering={FadeInDown.duration(350).springify().damping(12)}
+              entering={FadeInLeft.duration(300)}
               className="text-text font-bold text-base"
             >
               {habit.lastCompletedDate ? habit.lastCompletedDate.split('-').slice(1).join('/') : 'Never'}
@@ -370,7 +373,7 @@ export const HabitDetailFeature = () => {
             </View>
             <Animated.Text
               key={habit.streak}
-              entering={FadeInDown.duration(350).springify().damping(12)}
+              entering={FadeInRight.duration(300)}
               className="text-text font-bold text-base"
             >
               {habit.streak === 0 ? 'Starting' : habit.streak <= 5 ? 'Active' : 'Elite'}
