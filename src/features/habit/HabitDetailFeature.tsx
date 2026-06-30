@@ -99,52 +99,50 @@ export const HabitDetailFeature = () => {
     return isHabitScheduled(habit, new Date());
   }, [habit]);
 
-  const streakScale = useSharedValue(1);
-  const progress = useSharedValue(0);
+  const [bannerWidth, setBannerWidth] = useState(0);
+  const [prevStreak, setPrevStreak] = useState(habit?.streak || 0);
+
+  useEffect(() => {
+    if (habit) {
+      setPrevStreak(habit.streak);
+    }
+  }, [habit?.streak]);
+
+  const isStreakIncreasing = useMemo(() => {
+    if (!habit) return true;
+    return habit.streak >= prevStreak;
+  }, [habit, prevStreak]);
+
+  const greenProgress = useSharedValue(habit?.completedToday ? 1 : 0);
   const iconScale = useSharedValue(1);
 
   useEffect(() => {
     if (habit) {
-      streakScale.value = withSequence(
-        withSpring(1.2, { damping: 10, stiffness: 100 }),
-        withSpring(1, { damping: 15, stiffness: 120 })
-      );
-    }
-  }, [habit?.streak, streakScale]);
-
-  useEffect(() => {
-    if (habit) {
-      progress.value = withTiming(habit.completedToday ? 1 : 0, { duration: 300 });
+      greenProgress.value = withTiming(habit.completedToday ? 1 : 0, { duration: 400 });
       iconScale.value = withSequence(
         withSpring(1.3, { damping: 10 }),
         withSpring(1)
       );
     }
-  }, [habit?.completedToday, progress, iconScale]);
-
-  const streakStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: streakScale.value }]
-  }));
+  }, [habit?.completedToday, greenProgress, iconScale]);
 
   const animatedBannerStyle = useAnimatedStyle(() => {
-    const backgroundColor = interpolateColor(
-      progress.value,
+    const borderColor = interpolateColor(
+      greenProgress.value,
       [0, 1],
       [colors.primary, '#22C55E']
     );
     return {
-      backgroundColor,
-      borderColor: backgroundColor
+      borderColor,
     };
   });
 
-  const animatedTextColorStyle = useAnimatedStyle(() => {
-    const color = interpolateColor(
-      progress.value,
-      [0, 1],
-      [colors.primary, '#22C55E']
-    );
-    return { color };
+  const animatedOverlayStyle = useAnimatedStyle(() => {
+    const width = bannerWidth || 400;
+    const translateX = (1 - greenProgress.value) * -width;
+    return {
+      transform: [{ translateX }],
+    };
   });
 
   const iconStyle = useAnimatedStyle(() => ({
@@ -223,19 +221,43 @@ export const HabitDetailFeature = () => {
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => toggleHabit(habit.id)}
+          onLayout={(e) => setBannerWidth(e.nativeEvent.layout.width)}
+          style={{ overflow: 'hidden' }}
+          className="rounded-xl mb-6"
         >
           <Animated.View
-            className="flex-row items-center p-4 rounded-xl mb-6 border"
-            style={animatedBannerStyle}
+            className="flex-row items-center p-4 border"
+            style={[
+              {
+                backgroundColor: colors.primary,
+                position: 'relative',
+                overflow: 'hidden',
+                borderRadius: 12,
+              },
+              animatedBannerStyle,
+            ]}
           >
-            <Animated.View style={[{ marginRight: 12 }, iconStyle]}>
+            <Animated.View
+              style={[
+                {
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  backgroundColor: '#22C55E',
+                },
+                animatedOverlayStyle,
+              ]}
+            />
+            <Animated.View style={[{ marginRight: 12, zIndex: 1 }, iconStyle]}>
               <Ionicons
                 name={habit.completedToday ? 'checkmark-circle' : 'ellipse-outline'}
                 size={24}
                 color="white"
               />
             </Animated.View>
-            <View className="flex-1">
+            <View className="flex-1" style={{ zIndex: 1 }}>
               <Text className="font-semibold text-base text-white">
                 {habit.completedToday ? 'Completed for Today!' : 'Mark Completed Today'}
               </Text>
@@ -355,7 +377,7 @@ export const HabitDetailFeature = () => {
             </View>
             <Animated.Text
               key={habit.lastCompletedDate || 'never'}
-              entering={FadeInLeft.duration(300)}
+              entering={isStreakIncreasing ? FadeInLeft.duration(300) : FadeInRight.duration(300)}
               className="text-text font-bold text-base"
             >
               {habit.lastCompletedDate ? habit.lastCompletedDate.split('-').slice(1).join('/') : 'Never'}
@@ -373,7 +395,7 @@ export const HabitDetailFeature = () => {
             </View>
             <Animated.Text
               key={habit.streak}
-              entering={FadeInRight.duration(300)}
+              entering={isStreakIncreasing ? FadeInRight.duration(300) : FadeInLeft.duration(300)}
               className="text-text font-bold text-base"
             >
               {habit.streak === 0 ? 'Starting' : habit.streak <= 5 ? 'Active' : 'Elite'}
