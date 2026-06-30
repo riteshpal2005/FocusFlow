@@ -24,17 +24,22 @@ import Animated, {
 
 interface RollingDigitProps {
   digit: number;
+  isMounted: boolean;
 }
 
-const RollingDigit: React.FC<RollingDigitProps> = ({ digit }) => {
-  const translateY = useSharedValue(0);
+const RollingDigit: React.FC<RollingDigitProps> = ({ digit, isMounted }) => {
+  const translateY = useSharedValue(-digit * 48);
 
   useEffect(() => {
-    translateY.value = withTiming(-digit * 48, {
-      duration: 350,
-      easing: Easing.out(Easing.quad),
-    });
-  }, [digit]);
+    if (isMounted) {
+      translateY.value = withTiming(-digit * 48, {
+        duration: 350,
+        easing: Easing.out(Easing.quad),
+      });
+    } else {
+      translateY.value = -digit * 48;
+    }
+  }, [digit, isMounted]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
@@ -65,9 +70,10 @@ const RollingDigit: React.FC<RollingDigitProps> = ({ digit }) => {
 
 interface RollingNumberProps {
   value: number;
+  isMounted: boolean;
 }
 
-const RollingNumber: React.FC<RollingNumberProps> = ({ value }) => {
+const RollingNumber: React.FC<RollingNumberProps> = ({ value, isMounted }) => {
   const digits = useMemo(() => {
     const str = Math.abs(value).toString();
     return str.split('').map(Number);
@@ -76,7 +82,7 @@ const RollingNumber: React.FC<RollingNumberProps> = ({ value }) => {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', height: 48 }}>
       {digits.map((digit, index) => (
-        <RollingDigit key={index} digit={digit} />
+        <RollingDigit key={index} digit={digit} isMounted={isMounted} />
       ))}
     </View>
   );
@@ -126,12 +132,14 @@ export const HabitDetailFeature = () => {
 
   useEffect(() => {
     if (habit) {
-      greenProgress.value = withTiming(habit.completedToday ? 1 : 0, { duration: 400 });
       if (isMountedRef.current) {
+        greenProgress.value = withTiming(habit.completedToday ? 1 : 0, { duration: 400 });
         iconScale.value = withSequence(
           withSpring(1.3, { damping: 10 }),
           withSpring(1)
         );
+      } else {
+        greenProgress.value = habit.completedToday ? 1 : 0;
       }
     }
   }, [habit?.completedToday, greenProgress, iconScale]);
@@ -228,7 +236,7 @@ export const HabitDetailFeature = () => {
         </Text>
         <Text className="text-white text-3xl font-extrabold mb-4">{habit.name}</Text>
         <View className="flex-row items-baseline">
-          <RollingNumber value={habit.streak} />
+          <RollingNumber value={habit.streak} isMounted={isMountedRef.current} />
           <Text className="text-white text-lg font-medium ml-2" style={{ opacity: 0.8 }}>
             day streak
           </Text>
