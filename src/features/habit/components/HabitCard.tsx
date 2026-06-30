@@ -26,22 +26,43 @@ export const HabitCard: React.FC<HabitCardProps> = memo(({ habit, onToggle, onPr
   }, [habit.completedToday, scale]);
 
   const targetText = habit.streak > 0 ? `${habit.streak} Day Streak • ` : '';
+  const displayedStreakRef = React.useRef(displayedStreak);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setDisplayedStreak((prev) => {
-        if (prev === targetText) {
-          return prev;
-        }
-        if (targetText.startsWith(prev) && prev.length < targetText.length) {
-          return targetText.substring(0, prev.length + 1);
-        } else {
-          return prev.substring(0, prev.length - 1);
-        }
-      });
-    }, 20);
+    displayedStreakRef.current = displayedStreak;
+  }, [displayedStreak]);
 
-    return () => clearInterval(interval);
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (targetText) {
+      let currentIdx = 0;
+      setDisplayedStreak('');
+
+      interval = setInterval(() => {
+        currentIdx++;
+        if (currentIdx <= targetText.length) {
+          setDisplayedStreak(targetText.substring(0, currentIdx));
+        } else {
+          clearInterval(interval);
+        }
+      }, 30);
+    } else {
+      let currentStr = displayedStreakRef.current;
+
+      interval = setInterval(() => {
+        if (currentStr.length > 0) {
+          currentStr = currentStr.substring(0, currentStr.length - 1);
+          setDisplayedStreak(currentStr);
+        } else {
+          clearInterval(interval);
+        }
+      }, 20);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [targetText]);
 
   const checkmarkStyle = useAnimatedStyle(() => ({
