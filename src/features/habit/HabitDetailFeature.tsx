@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -76,7 +76,7 @@ const RollingNumber: React.FC<RollingNumberProps> = ({ value }) => {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', height: 48 }}>
       {digits.map((digit, index) => (
-        <RollingDigit key={`${index}-${digit}`} digit={digit} />
+        <RollingDigit key={index} digit={digit} />
       ))}
     </View>
   );
@@ -101,6 +101,14 @@ export const HabitDetailFeature = () => {
 
   const [bannerWidth, setBannerWidth] = useState(0);
   const [prevStreak, setPrevStreak] = useState(habit?.streak || 0);
+  const isMountedRef = useRef(false);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (habit) {
@@ -119,10 +127,12 @@ export const HabitDetailFeature = () => {
   useEffect(() => {
     if (habit) {
       greenProgress.value = withTiming(habit.completedToday ? 1 : 0, { duration: 400 });
-      iconScale.value = withSequence(
-        withSpring(1.3, { damping: 10 }),
-        withSpring(1)
-      );
+      if (isMountedRef.current) {
+        iconScale.value = withSequence(
+          withSpring(1.3, { damping: 10 }),
+          withSpring(1)
+        );
+      }
     }
   }, [habit?.completedToday, greenProgress, iconScale]);
 
@@ -140,6 +150,14 @@ export const HabitDetailFeature = () => {
   const animatedOverlayStyle = useAnimatedStyle(() => {
     const width = bannerWidth || 400;
     const translateX = (1 - greenProgress.value) * -width;
+    return {
+      transform: [{ translateX }],
+    };
+  });
+
+  const animatedContentStyle = useAnimatedStyle(() => {
+    const width = bannerWidth || 400;
+    const translateX = (1 - greenProgress.value) * width;
     return {
       transform: [{ translateX }],
     };
@@ -237,6 +255,24 @@ export const HabitDetailFeature = () => {
               animatedBannerStyle,
             ]}
           >
+            {/* Bottom Layer Content (Blue - Incomplete State) */}
+            <View style={{ marginRight: 12 }}>
+              <Ionicons
+                name="ellipse-outline"
+                size={24}
+                color="white"
+              />
+            </View>
+            <View className="flex-1">
+              <Text className="font-semibold text-base text-white">
+                Mark Completed Today
+              </Text>
+              <Text className="text-white text-xs mt-0.5" style={{ opacity: 0.8 }}>
+                Tap to mark this routine as done.
+              </Text>
+            </View>
+
+            {/* Absolute Green Overlay Container (Slides Left-to-Right) */}
             <Animated.View
               style={[
                 {
@@ -246,25 +282,41 @@ export const HabitDetailFeature = () => {
                   left: 0,
                   right: 0,
                   backgroundColor: '#22C55E',
+                  overflow: 'hidden',
                 },
                 animatedOverlayStyle,
               ]}
-            />
-            <Animated.View style={[{ marginRight: 12, zIndex: 1 }, iconStyle]}>
-              <Ionicons
-                name={habit.completedToday ? 'checkmark-circle' : 'ellipse-outline'}
-                size={24}
-                color="white"
-              />
+            >
+              {/* Top Layer Content (Green - Completed State, Slides in reverse to stay stationary) */}
+              <Animated.View
+                style={[
+                  {
+                    width: bannerWidth,
+                    height: '100%',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    paddingHorizontal: 16,
+                  },
+                  animatedContentStyle,
+                ]}
+              >
+                <Animated.View style={[{ marginRight: 12 }, iconStyle]}>
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={24}
+                    color="white"
+                  />
+                </Animated.View>
+                <View className="flex-1">
+                  <Text className="font-semibold text-base text-white">
+                    Completed for Today!
+                  </Text>
+                  <Text className="text-white text-xs mt-0.5" style={{ opacity: 0.8 }}>
+                    Great job! Tap to undo completion.
+                  </Text>
+                </View>
+              </Animated.View>
             </Animated.View>
-            <View className="flex-1" style={{ zIndex: 1 }}>
-              <Text className="font-semibold text-base text-white">
-                {habit.completedToday ? 'Completed for Today!' : 'Mark Completed Today'}
-              </Text>
-              <Text className="text-white text-xs mt-0.5" style={{ opacity: 0.8 }}>
-                {habit.completedToday ? 'Great job! Tap to undo completion.' : 'Tap to mark this routine as done.'}
-              </Text>
-            </View>
           </Animated.View>
         </TouchableOpacity>
       ) : (
@@ -377,7 +429,7 @@ export const HabitDetailFeature = () => {
             </View>
             <Animated.Text
               key={habit.lastCompletedDate || 'never'}
-              entering={isStreakIncreasing ? FadeInLeft.duration(300) : FadeInRight.duration(300)}
+              entering={isMountedRef.current ? (isStreakIncreasing ? FadeInLeft.duration(300) : FadeInRight.duration(300)) : undefined}
               className="text-text font-bold text-base"
             >
               {habit.lastCompletedDate ? habit.lastCompletedDate.split('-').slice(1).join('/') : 'Never'}
@@ -395,7 +447,7 @@ export const HabitDetailFeature = () => {
             </View>
             <Animated.Text
               key={habit.streak}
-              entering={isStreakIncreasing ? FadeInRight.duration(300) : FadeInLeft.duration(300)}
+              entering={isMountedRef.current ? (isStreakIncreasing ? FadeInRight.duration(300) : FadeInLeft.duration(300)) : undefined}
               className="text-text font-bold text-base"
             >
               {habit.streak === 0 ? 'Starting' : habit.streak <= 5 ? 'Active' : 'Elite'}
