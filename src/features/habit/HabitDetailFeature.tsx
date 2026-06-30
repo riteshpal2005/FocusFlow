@@ -107,14 +107,7 @@ export const HabitDetailFeature = () => {
 
   const [bannerWidth, setBannerWidth] = useState(0);
   const [prevStreak, setPrevStreak] = useState(habit?.streak || 0);
-  const isMountedRef = useRef(false);
-
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
+  const [hasToggled, setHasToggled] = useState(false);
 
   useEffect(() => {
     if (habit) {
@@ -132,7 +125,7 @@ export const HabitDetailFeature = () => {
 
   useEffect(() => {
     if (habit) {
-      if (isMountedRef.current) {
+      if (hasToggled) {
         greenProgress.value = withTiming(habit.completedToday ? 1 : 0, { duration: 400 });
         iconScale.value = withSequence(
           withSpring(1.3, { damping: 10 }),
@@ -142,7 +135,7 @@ export const HabitDetailFeature = () => {
         greenProgress.value = habit.completedToday ? 1 : 0;
       }
     }
-  }, [habit?.completedToday, greenProgress, iconScale]);
+  }, [habit?.completedToday, greenProgress, iconScale, hasToggled]);
 
   const animatedBannerStyle = useAnimatedStyle(() => {
     const borderColor = interpolateColor(
@@ -236,7 +229,7 @@ export const HabitDetailFeature = () => {
         </Text>
         <Text className="text-white text-3xl font-extrabold mb-4">{habit.name}</Text>
         <View className="flex-row items-baseline">
-          <RollingNumber value={habit.streak} isMounted={isMountedRef.current} />
+          <RollingNumber value={habit.streak} isMounted={hasToggled} />
           <Text className="text-white text-lg font-medium ml-2" style={{ opacity: 0.8 }}>
             day streak
           </Text>
@@ -246,7 +239,10 @@ export const HabitDetailFeature = () => {
       {isScheduledToday ? (
         <TouchableOpacity
           activeOpacity={0.8}
-          onPress={() => toggleHabit(habit.id)}
+          onPress={() => {
+            toggleHabit(habit.id);
+            setHasToggled(true);
+          }}
           onLayout={(e) => setBannerWidth(e.nativeEvent.layout.width)}
           style={{ overflow: 'hidden' }}
           className="rounded-xl mb-6"
@@ -437,7 +433,7 @@ export const HabitDetailFeature = () => {
             </View>
             <Animated.Text
               key={habit.lastCompletedDate || 'never'}
-              entering={isMountedRef.current ? (isStreakIncreasing ? FadeInLeft.duration(300) : FadeInRight.duration(300)) : undefined}
+              entering={hasToggled ? (isStreakIncreasing ? FadeInLeft.duration(300) : FadeInRight.duration(300)) : undefined}
               className="text-text font-bold text-base"
             >
               {habit.lastCompletedDate ? habit.lastCompletedDate.split('-').slice(1).join('/') : 'Never'}
@@ -455,7 +451,7 @@ export const HabitDetailFeature = () => {
             </View>
             <Animated.Text
               key={habit.streak}
-              entering={isMountedRef.current ? (isStreakIncreasing ? FadeInRight.duration(300) : FadeInLeft.duration(300)) : undefined}
+              entering={hasToggled ? (isStreakIncreasing ? FadeInRight.duration(300) : FadeInLeft.duration(300)) : undefined}
               className="text-text font-bold text-base"
             >
               {habit.streak === 0 ? 'Starting' : habit.streak <= 5 ? 'Active' : 'Elite'}
